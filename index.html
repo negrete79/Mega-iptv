@@ -1,322 +1,538 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KidsTV - Diversão Infantil</title>
-    <style>
-        :root {
-            --primary-color: #FF9FF3;
-            --secondary-color: #54A0FF;
-            --background-color: #F0F3F7;
-            --text-color: #2C3E50;
-            --button-color: #d5006d; /* Cor mais forte para o botão */
-        }
-
-        body {
-            font-family: 'Rounded Mplus 1c', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-weight: bold;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-
-        .player-container {
-            background-color: #FFF;
-            border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-bottom: 20px;
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-        }
-
-        #video-player {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background-color: #000;
-        }
-
-        .carousel {
-            display: flex;
-            overflow: hidden;
-            margin-top: 10px;
-            position: relative;
-            max-width: 400px; /* Limita a largura do carrossel */
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .carousel-inner {
-            display: flex;
-            transition: transform 0.5s ease;
-        }
-
-        .channel-item {
-            min-width: 80px; /* Largura mínima para cada item */
-            margin-right: 5px; /* Menor margem entre os itens */
-            cursor: pointer;
-        }
-
-        .channel-item img {
-            width: 100%;
-            border-radius: 10px;
-        }
-
+<html><head><base href="https://example.com"></base><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Mega IPTV - Streaming IPTV Moderno</title><script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script><script src="https://cdn.tailwindcss.com"></script><style>
+    :root {
+        --primary-color: #ff0000;
+    }
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+    }
+    .header {
+        background-color: var(--primary-color);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .main-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .channel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    .channel-card {
+        position: relative;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .channel-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .channel-card img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+    }
+    .channel-card .info {
+        padding: 1rem;
+    }
+    .play-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .channel-card:hover .play-btn {
+        opacity: 1;
+    }
+    .video-player {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        z-index: 2000;
+        display: none;
+    }
+    .video-controls {
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .scroll-top {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: none;
+        z-index: 1000;
+    }
+    .admin-panel {
+        background-color: white;
+        border-radius: 8px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    .admin-form {
+        display: grid;
+        gap: 1rem;
+    }
+    .admin-form input, .admin-form select, .admin-form button {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .admin-form button {
+        background-color: var(--primary-color);
+        color: white;
+        cursor: pointer;
+    }
+    .admin-form button:hover {
+        background-color: #cc0000;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 3000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    @media (max-width: 768px) {
         .channel-grid {
-            display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
         }
-
-        .channel-item-grid {
-            background-color: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            cursor: pointer;
+    }
+    @media (max-width: 640px) {
+        .channel-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         }
-
-        .channel-item-grid:hover {
-            transform: translateY(-10px);
+        .header {
+            flex-direction: column;
+            align-items: center;
         }
-
-        .channel-item-grid img {
+        #searchInput {
             width: 100%;
-            height: 150px;
-            object-fit: cover;
+            margin: 1rem 0;
         }
-
-        .channel-item-grid h3 {
-            padding: 15px;
-            margin: 0;
-            text-align: center;
-            font-size: 1.2em;
-        }
-
-        footer {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            margin-top: 20px;
-            border-radius: 20px;
-            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .social-icons {
-            margin: 10px 0;
-        }
-
-        .social-icons a {
-            margin: 0 10px;
-            color: white;
-            text-decoration: none;
-            font-size: 1.5em;
-        }
-
-        .social-icons a:hover {
-            color: #FFC107; /* Cor ao passar o mouse */
-        }
-
-        .social-icons img {
-            width: 30px; /* Tamanho dos ícones */
-            height: 30px; /* Tamanho dos ícones */
-        }
-
-        /* Estilo do botão de subir */
-        #scrollToTopBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 30px;
-            z-index: 100;
-            display: none; /* Inicialmente oculto */
-            background-color: var(--button-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 15px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            font-size: 1em; /* Tamanho da fonte do botão */
-        }
-
-        #scrollToTopBtn:hover {
-            background-color: var(--secondary-color); /* Cor ao passar o mouse */
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>🌈 KidsTV</h1>
+    }
+</style></head><body>
+    <header class="header">
+        <h1 class="text-2xl font-bold">Mega IPTV</h1>
+        <input type="text" id="searchInput" placeholder="Buscar canais" class="px-4 py-2 rounded-full">
+        <nav>
+            <ul class="flex space-x-4">
+                <li><a href="#" id="profileLink" class="hover:underline">Perfil</a></li>
+                <li><a href="#" id="adminLink" class="hover:underline">Admin</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <div class="container">
-        <div class="player-container" id="playerContainer">
-            <video id="video-player" controls></video>
-            <div class="carousel" id="channelCarousel">
-                <div class="carousel-inner" id="carouselInner"></div>
+    <main class="main-content">
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Canais em Destaque</h2>
+            <div class="channel-grid" id="channelGrid">
+                <!-- Canais serão carregados dinamicamente aqui -->
             </div>
-        </div>
+        </section>
 
-        <div class="channel-grid" id="channelGrid"></div>
+        <section id="adminPanel" class="admin-panel" style="display: none;">
+            <h2 class="text-xl font-semibold mb-4">Painel de Administração</h2>
+            <form id="addChannelForm" class="admin-form">
+                <input type="text" id="channelName" placeholder="Nome do Canal" required>
+                <input type="url" id="channelUrl" placeholder="URL do Stream" required>
+                <input type="url" id="channelThumbnail" placeholder="URL da Imagem de Thumbnail" required>
+                <select id="channelCategory" required>
+                    <option value="">Selecione a categoria</option>
+                    <option value="geral">Geral</option>
+                    <option value="esportes">Esportes</option>
+                    <option value="noticias">Notícias</option>
+                    <option value="filmes">Filmes</option>
+                    <option value="adulto">Adulto</option>
+                    <option value="musica">Música</option>
+                    <option value="documentarios">Documentários</option>
+                </select>
+                <input type="password" id="channelPassword" placeholder="Senha para operações de canal" class="w-full p-2 border rounded">
+                <button type="submit">Adicionar Canal</button>
+            </form>
+            <button id="logoutAdmin" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-4">
+                Sair do Painel Admin
+            </button>
+        </section>
+    </main>
+
+    <div class="video-player" id="videoPlayer">
+        <video id="videoElement" controls></video>
+        <div class="video-controls">
+            <button id="closePlayer" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Fechar
+            </button>
+            <button id="recordChannel" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Gravar
+            </button>
+        </div>
     </div>
 
- <footer>
-        <p>© 2023 KidsTV. Todos os direitos reservados.</p>
-        <div class="social-icons">
-            <a href="https://telegram.org" target="_blank">
-                <img src="https://i.postimg.cc/j26JGB80/Photoroom-20241005-021836.png" alt="Telegram">
-            </a>
-            <a href="https://instagram.com" target="_blank">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
-            </a>
-            <a href="https://youtube.com" target="_blank">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube">
-            </a>
+    <button id="scrollTop" class="scroll-top">↑</button>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login de Administrador</h2>
+            <form id="adminLoginForm">
+                <input type="password" id="adminPassword" placeholder="Senha de administrador" required>
+                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Entrar</button>
+            </form>
         </div>
-        <p>Entretenimento infantil para todas as idades!</p>
-    </footer>
+    </div>
 
-    <button id="scrollToTopBtn">↑  Topo</button>
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Perfil do Usuário</h2>
+            <form id="profileForm">
+                <input type="text" id="userName" placeholder="Nome" required>
+                <input type="email" id="userEmail" placeholder="Email" required>
+                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Salvar</button>
+            </form>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <div id="adultContentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Conteúdo Adulto</h2>
+            <p>Você está prestes a acessar conteúdo adulto. Por favor, confirme que você tem mais de 18 anos.</p>
+            <button id="confirmAdult" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Confirmar</button>
+        </div>
+    </div>
+
+    <div id="channelPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Confirmar Senha</h2>
+            <p>Por favor, insira a senha para realizar esta operação.</p>
+            <input type="password" id="confirmChannelPassword" placeholder="Senha" required>
+            <button id="confirmChannelPasswordBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Confirmar</button>
+        </div>
+    </div>
+
     <script>
-        const videoPlayer = document.getElementById('video-player');
-        const carouselInner = document.getElementById('carouselInner');
-        const channelGrid = document.getElementById('channelGrid');
-        let hls;
-        let currentChannelIndex = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            let channels = JSON.parse(localStorage.getItem('channels')) || [];
+            const adminPassword = "admin123"; 
+            let isAdminLoggedIn = false;
+            let isAdultConfirmed = false;
+            let currentOperation = null;
+            let currentChannelCode = null;
 
-        const channels = [
-            { name: "Discovery Kids", logo: "https://d18o29lhcg4kda.cloudfront.net/fit-in/250x250/Y2gwMTAwMDAwMDAwMDE1X2xpbmVhcl9jaGFubmVsX2Jy_11002_LOGO_250x250.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1007.m3u8" },
-            { name: "Cartoon Network", logo: "https://d18o29lhcg4kda.cloudfront.net/fit-in/360x270/Y2gwMTAwMDAwMDAwMDk0X2xpbmVhcl9jaGFubmVsX2Jy_11002_LOGO_360x270.png?timestamp=1724333416698", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/956.m3u8" },
-            { name: "Disney Channel", logo: "https://i.imgur.com/LblzhZd.jpg", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1022.m3u8" },
-            { name: "Nickelodeon", logo: "https://i.imgur.com/OAIk8nv.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1552.m3u8" },
-            { name: "Cartoonito", logo: "https://d18o29lhcg4kda.cloudfront.net/fit-in/360x270/Y2gwMTAwMDAwMDAwMDgwX2xpbmVhcl9jaGFubmVsX2Jy_11002_LOGO_360x270.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/959.m3u8" },
-            { name: "Baby TV", logo: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Babytvv.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/919.m3u8" },
-            { name: "Gloob", logo: "https://i.imgur.com/6zr8u9x.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1454.m3u8" },
-            { name: "Gloobinho", logo: "https://i.imgur.com/aQlqy0o.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1457.m3u8" },
-            { name: "Zoomoo", logo: "https://i.imgur.com/9beIdtp.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1792.m3u8" },
-            { name: "Ra ti bum", logo: "https://i.imgur.com/cMvC2gg.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1758.m3u8" } // Novo canal
-        ];
+            const channelGrid = document.getElementById('channelGrid');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoElement = document.getElementById('videoElement');
+            const closePlayer = document.getElementById('closePlayer');
+            const recordChannel = document.getElementById('recordChannel');
+            const scrollTop = document.getElementById('scrollTop');
+            const addChannelForm = document.getElementById('addChannelForm');
+            const adminPanel = document.getElementById('adminPanel');
+            const adminLink = document.getElementById('adminLink');
+            const adminModal = document.getElementById('adminModal');
+            const adminLoginForm = document.getElementById('adminLoginForm');
+            const adultContentModal = document.getElementById('adultContentModal');
+            const confirmAdult = document.getElementById('confirmAdult');
+            const logoutAdmin = document.getElementById('logoutAdmin');
+            const channelPasswordModal = document.getElementById('channelPasswordModal');
+            const confirmChannelPassword = document.getElementById('confirmChannelPassword');
+            const confirmChannelPasswordBtn = document.getElementById('confirmChannelPasswordBtn');
+            const channelPassword = document.getElementById('channelPassword');
+            const profileLink = document.getElementById('profileLink');
+            const profileModal = document.getElementById('profileModal');
+            const profileForm = document.getElementById('profileForm');
+            const searchInput = document.getElementById('searchInput');
 
-        function loadStream(url) {
-            if (Hls.isSupported()) {
-                if (hls) {
-                    hls.destroy();
+            // Add null checks for all elements
+            if (!channelGrid || !videoPlayer || !videoElement || !closePlayer || !recordChannel || 
+                !scrollTop || !addChannelForm || !adminPanel || !adminLink || !adminModal || 
+                !adminLoginForm || !adultContentModal || !confirmAdult || !logoutAdmin || 
+                !channelPasswordModal || !confirmChannelPassword || !confirmChannelPasswordBtn || 
+                !channelPassword || !profileLink || !profileModal || !profileForm || !searchInput) {
+                console.error('One or more required elements are missing from the DOM');
+                return;
+            }
+
+            function generateChannelCode() {
+                return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            }
+
+            function populateChannelGrid(filteredChannels = channels) {
+                channelGrid.innerHTML = '';
+                filteredChannels.forEach(channel => {
+                    if (channel.category === 'adulto' && !isAdultConfirmed) {
+                        return;
+                    }
+                    const channelCard = document.createElement('div');
+                    channelCard.className = 'channel-card';
+                    channelCard.innerHTML = `
+                        <img src="${channel.thumbnail}" alt="${channel.name}" width="200" height="120">
+                        <div class="info">
+                            <h3>${channel.name}</h3>
+                            <p>Categoria: ${channel.category}</p>
+                            <button class="play-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mt-2" data-url="${channel.url}" data-category="${channel.category}">
+                                Assistir
+                            </button>
+                            ${isAdminLoggedIn ? `
+                                <button class="edit-btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2" data-code="${channel.code}">
+                                    Editar
+                                </button>
+                                <button class="delete-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mt-2" data-code="${channel.code}">
+                                    Excluir
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+                    channelGrid.appendChild(channelCard);
+                });
+            }
+
+            function initPlayer(url) {
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(url);
+                    hls.attachMedia(videoElement);
+                } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                    videoElement.src = url;
                 }
-                hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(videoPlayer);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    videoPlayer.play();
-                });
-            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-                videoPlayer.src = url;
-                videoPlayer.addEventListener('loadedmetadata', () => {
-                    videoPlayer.play();
-                });
-            }
-        }
-
-        function createChannelItem(channel) {
-            const item = document.createElement('div');
-            item.className = 'channel-item';
-            item.innerHTML = `<img src="${channel.logo}" alt="${channel.name}">`;
-            item.onclick = () => {
-                loadStream(channel.stream);
-            };
-            return item;
-        }
-
-        function loadChannelsIntoCarousel() {
-            channels.forEach(channel => {
-                carouselInner.appendChild(createChannelItem(channel));
-            });
-        }
-
-        function createChannelItemGrid(channel, index) {
-            const channelItem = document.createElement('div');
-            channelItem.className = 'channel-item-grid';
-            channelItem.innerHTML = `
-                <img src="${channel.logo}" alt="${channel.name}">
-                <h3>${channel.name}</h3>
-            `;
-            channelItem.addEventListener('click', () => {
-                currentChannelIndex = index;
-                loadStream(channel.stream);
-            });
-            return channelItem;
-        }
-
-        function loadChannelsIntoGrid() {
-            channels.forEach((channel, index) => {
-                channelGrid.appendChild(createChannelItemGrid(channel, index));
-            });
-        }
-
-        // Função para mover automaticamente o carrossel
-        let currentIndex = 0;
-
-        function autoScrollCarousel() {
-            const totalItems = channels.length;
-            const itemWidth = 80; // Largura do item em pixels
-            currentIndex = (currentIndex + 1) % totalItems; // Atualiza o índice
-
-            carouselInner.style.transform = `translateX(-${currentIndex * itemWidth}px)`; // Move o carrossel
-        }
-
-        window.addEventListener('load', () => {
-            loadChannelsIntoCarousel();
-            loadChannelsIntoGrid();
-            if (channels.length > 0) {
-                loadStream(channels[0].stream);
             }
 
-            // Inicia o movimento automático do carrossel
-            setInterval(autoScrollCarousel, 3000); // Altera a cada 3 segundos
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredChannels = channels.filter(channel => 
+                    channel.name.toLowerCase().includes(searchTerm) ||
+                    channel.category.toLowerCase().includes(searchTerm)
+                );
+                populateChannelGrid(filteredChannels);
+            });
+
+            channelGrid.addEventListener('click', (e) => {
+                if (e.target.classList.contains('play-btn')) {
+                    const url = e.target.dataset.url;
+                    const category = e.target.dataset.category;
+                    if (category === 'adulto' && !isAdultConfirmed) {
+                        adultContentModal.style.display = 'block';
+                        confirmAdult.onclick = () => {
+                            isAdultConfirmed = true;
+                            adultContentModal.style.display = 'none';
+                            initPlayer(url);
+                            videoPlayer.style.display = 'block';
+                        };
+                    } else {
+                        initPlayer(url);
+                        videoPlayer.style.display = 'block';
+                    }
+                } else if (e.target.classList.contains('edit-btn')) {
+                    showPasswordConfirmation('edit', e.target.dataset.code);
+                } else if (e.target.classList.contains('delete-btn')) {
+                    showPasswordConfirmation('delete', e.target.dataset.code);
+                }
+            });
+
+            function showPasswordConfirmation(operation, channelCode) {
+                currentOperation = operation;
+                currentChannelCode = channelCode;
+                channelPasswordModal.style.display = 'block';
+            }
+
+            confirmChannelPasswordBtn.addEventListener('click', () => {
+                if (confirmChannelPassword.value === channelPassword.value) {
+                    channelPasswordModal.style.display = 'none';
+                    if (currentOperation === 'edit') {
+                        editChannel(currentChannelCode);
+                    } else if (currentOperation === 'delete') {
+                        deleteChannel(currentChannelCode);
+                    }
+                } else {
+                    alert('Senha incorreta!');
+                }
+                confirmChannelPassword.value = '';
+            });
+
+            function editChannel(channelCode) {
+                const channel = channels.find(ch => ch.code === channelCode);
+                if (channel) {
+                    document.getElementById('channelName').value = channel.name;
+                    document.getElementById('channelUrl').value = channel.url;
+                    document.getElementById('channelThumbnail').value = channel.thumbnail;
+                    document.getElementById('channelCategory').value = channel.category;
+
+                    addChannelForm.onsubmit = (e) => {
+                        e.preventDefault();
+                        channel.name = document.getElementById('channelName').value;
+                        channel.url = document.getElementById('channelUrl').value;
+                        channel.thumbnail = document.getElementById('channelThumbnail').value;
+                        channel.category = document.getElementById('channelCategory').value;
+
+                        localStorage.setItem('channels', JSON.stringify(channels));
+                        populateChannelGrid();
+                        addChannelForm.reset();
+                        addChannelForm.onsubmit = addNewChannel; // Reset to add new channel function
+                    };
+                }
+            }
+
+            function addNewChannel(e) {
+                e.preventDefault();
+                const name = document.getElementById('channelName').value;
+                const url = document.getElementById('channelUrl').value;
+                const thumbnail = document.getElementById('channelThumbnail').value;
+                const category = document.getElementById('channelCategory').value;
+                const code = generateChannelCode();
+
+                const newChannel = { name, url, thumbnail, category, code };
+                channels.push(newChannel);
+                localStorage.setItem('channels', JSON.stringify(channels));
+                populateChannelGrid();
+                addChannelForm.reset();
+            }
+
+            function deleteChannel(channelCode) {
+                if (confirm('Tem certeza que deseja excluir este canal?')) {
+                    channels = channels.filter(ch => ch.code !== channelCode);
+                    localStorage.setItem('channels', JSON.stringify(channels));
+                    populateChannelGrid();
+                }
+            }
+
+            if (closePlayer) {
+                closePlayer.addEventListener('click', () => {
+                    videoPlayer.style.display = 'none';
+                    videoElement.pause();
+                });
+            }
+
+            if (recordChannel) {
+                recordChannel.addEventListener('click', () => {
+                    console.log('Recording channel...');
+                });
+            }
+
+            if (scrollTop) {
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 300) {
+                        scrollTop.style.display = 'block';
+                    } else {
+                        scrollTop.style.display = 'none';
+                    }
+                });
+
+                scrollTop.addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+
+            if (addChannelForm) {
+                addChannelForm.addEventListener('submit', addNewChannel);
+            }
+
+            if (adminLink) {
+                adminLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (isAdminLoggedIn) {
+                        adminPanel.style.display = 'block';
+                    } else {
+                        adminModal.style.display = 'block';
+                    }
+                });
+            }
+
+            if (adminLoginForm) {
+                adminLoginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const password = document.getElementById('adminPassword').value;
+                    if (password === adminPassword) {
+                        isAdminLoggedIn = true;
+                        adminModal.style.display = 'none';
+                        adminPanel.style.display = 'block';
+                    } else {
+                        alert('Senha incorreta!');
+                    }
+                });
+            }
+
+            if (logoutAdmin) {
+                logoutAdmin.addEventListener('click', () => {
+                    isAdminLoggedIn = false;
+                    adminPanel.style.display = 'none';
+                    populateChannelGrid(); 
+                });
+            }
+
+            profileLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                profileModal.style.display = 'block';
+            });
+
+            profileForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const userName = document.getElementById('userName').value;
+                const userEmail = document.getElementById('userEmail').value;
+                localStorage.setItem('userName', userName);
+                localStorage.setItem('userEmail', userEmail);
+                alert('Perfil salvo com sucesso!');
+                profileModal.style.display = 'none';
+            });
+
+            document.querySelectorAll('.close').forEach(closeBtn => {
+                closeBtn.onclick = function() {
+                    this.closest('.modal').style.display = 'none';
+                }
+            });
+
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = "none";
+                }
+            }
+
+            populateChannelGrid();
         });
-
-        // Mostrar/ocultar o botão de subir
-        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-        window.onscroll = function() {
-            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-                scrollToTopBtn.style.display = "block";
-            } else {
-                scrollToTopBtn.style.display = "none";
-            }
-        };
-
-        // Função para voltar ao topo com efeito de deslizamento
-        scrollToTopBtn.onclick = function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Rolagem suave para o topo
-        };
     </script>
-</body>
-</html>
-```
-
+</body></html>
