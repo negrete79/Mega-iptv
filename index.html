@@ -1,538 +1,121 @@
-<html><head><base href="https://example.com"></base><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Mega IPTV - Streaming IPTV Moderno</title><script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script><script src="https://cdn.tailwindcss.com"></script><style>
-    :root {
-        --primary-color: #ff0000;
-    }
-    body {
-        font-family: 'Roboto', sans-serif;
-        background-color: #f8f9fa;
-    }
-    .header {
-        background-color: var(--primary-color);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .main-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-    .channel-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-    .channel-card {
-        position: relative;
-        background-color: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-    .channel-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    .channel-card img {
-        width: 100%;
-        height: 120px;
-        object-fit: cover;
-    }
-    .channel-card .info {
-        padding: 1rem;
-    }
-    .play-btn {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    .channel-card:hover .play-btn {
-        opacity: 1;
-    }
-    .video-player {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: black;
-        z-index: 2000;
-        display: none;
-    }
-    .video-controls {
-        background-color: rgba(0, 0, 0, 0.7);
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .scroll-top {
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-        cursor: pointer;
-        display: none;
-        z-index: 1000;
-    }
-    .admin-panel {
-        background-color: white;
-        border-radius: 8px;
-        padding: 2rem;
-        margin-top: 2rem;
-    }
-    .admin-form {
-        display: grid;
-        gap: 1rem;
-    }
-    .admin-form input, .admin-form select, .admin-form button {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-    .admin-form button {
-        background-color: var(--primary-color);
-        color: white;
-        cursor: pointer;
-    }
-    .admin-form button:hover {
-        background-color: #cc0000;
-    }
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 3000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 500px;
-    }
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    @media (max-width: 768px) {
-        .channel-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        }
-    }
-    @media (max-width: 640px) {
-        .channel-grid {
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        }
-        .header {
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reprodutor HLS</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
             flex-direction: column;
-            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
         }
-        #searchInput {
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #444;
+            color: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+        }
+        .sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .sidebar a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            margin: 10px 0;
+        }
+        .sidebar a:hover {
+            text-decoration: underline;
+        }
+        .main {
+            flex: 1;
+            padding: 20px;
+        }
+        video {
             width: 100%;
-            margin: 1rem 0;
+            max-width: 800px;
+            border: 1px solid #ccc;
+            background: black;
         }
-    }
-</style></head><body>
-    <header class="header">
-        <h1 class="text-2xl font-bold">Mega IPTV</h1>
-        <input type="text" id="searchInput" placeholder="Buscar canais" class="px-4 py-2 rounded-full">
-        <nav>
-            <ul class="flex space-x-4">
-                <li><a href="#" id="profileLink" class="hover:underline">Perfil</a></li>
-                <li><a href="#" id="adminLink" class="hover:underline">Admin</a></li>
-            </ul>
-        </nav>
+        .controls {
+            margin-top: 15px;
+        }
+        .controls input {
+            width: calc(100% - 100px);
+            padding: 10px;
+        }
+        .controls button {
+            padding: 10px 15px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Reprodutor de Stream HLS</h1>
     </header>
-
-    <main class="main-content">
-        <section>
-            <h2 class="text-xl font-semibold mb-4">Canais em Destaque</h2>
-            <div class="channel-grid" id="channelGrid">
-                <!-- Canais serão carregados dinamicamente aqui -->
+    <div class="container">
+        <div class="sidebar">
+            <h2>Painel de Navegação</h2>
+            <a href="#">Home</a>
+            <a href="#">Sobre</a>
+            <a href="#">Contato</a>
+            <a href="#">Ajuda</a>
+        </div>
+        <div class="main">
+            <video id="videoElement" controls></video>
+            <div class="controls">
+                <label for="streamUrl">Insira a URL do stream .m3u8:</label>
+                <input type="text" id="streamUrl" placeholder="Cole a URL do stream aqui">
+                <button id="playButton">Reproduzir</button>
             </div>
-        </section>
-
-        <section id="adminPanel" class="admin-panel" style="display: none;">
-            <h2 class="text-xl font-semibold mb-4">Painel de Administração</h2>
-            <form id="addChannelForm" class="admin-form">
-                <input type="text" id="channelName" placeholder="Nome do Canal" required>
-                <input type="url" id="channelUrl" placeholder="URL do Stream" required>
-                <input type="url" id="channelThumbnail" placeholder="URL da Imagem de Thumbnail" required>
-                <select id="channelCategory" required>
-                    <option value="">Selecione a categoria</option>
-                    <option value="geral">Geral</option>
-                    <option value="esportes">Esportes</option>
-                    <option value="noticias">Notícias</option>
-                    <option value="filmes">Filmes</option>
-                    <option value="adulto">Adulto</option>
-                    <option value="musica">Música</option>
-                    <option value="documentarios">Documentários</option>
-                </select>
-                <input type="password" id="channelPassword" placeholder="Senha para operações de canal" class="w-full p-2 border rounded">
-                <button type="submit">Adicionar Canal</button>
-            </form>
-            <button id="logoutAdmin" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-4">
-                Sair do Painel Admin
-            </button>
-        </section>
-    </main>
-
-    <div class="video-player" id="videoPlayer">
-        <video id="videoElement" controls></video>
-        <div class="video-controls">
-            <button id="closePlayer" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                Fechar
-            </button>
-            <button id="recordChannel" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Gravar
-            </button>
-        </div>
-    </div>
-
-    <button id="scrollTop" class="scroll-top">↑</button>
-
-    <div id="adminModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Login de Administrador</h2>
-            <form id="adminLoginForm">
-                <input type="password" id="adminPassword" placeholder="Senha de administrador" required>
-                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Entrar</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Perfil do Usuário</h2>
-            <form id="profileForm">
-                <input type="text" id="userName" placeholder="Nome" required>
-                <input type="email" id="userEmail" placeholder="Email" required>
-                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Salvar</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="adultContentModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Conteúdo Adulto</h2>
-            <p>Você está prestes a acessar conteúdo adulto. Por favor, confirme que você tem mais de 18 anos.</p>
-            <button id="confirmAdult" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Confirmar</button>
-        </div>
-    </div>
-
-    <div id="channelPasswordModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Confirmar Senha</h2>
-            <p>Por favor, insira a senha para realizar esta operação.</p>
-            <input type="password" id="confirmChannelPassword" placeholder="Senha" required>
-            <button id="confirmChannelPasswordBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Confirmar</button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let channels = JSON.parse(localStorage.getItem('channels')) || [];
-            const adminPassword = "admin123"; 
-            let isAdminLoggedIn = false;
-            let isAdultConfirmed = false;
-            let currentOperation = null;
-            let currentChannelCode = null;
+        const video = document.getElementById('videoElement');
+        const playButton = document.getElementById('playButton');
+        const streamUrlInput = document.getElementById('streamUrl');
 
-            const channelGrid = document.getElementById('channelGrid');
-            const videoPlayer = document.getElementById('videoPlayer');
-            const videoElement = document.getElementById('videoElement');
-            const closePlayer = document.getElementById('closePlayer');
-            const recordChannel = document.getElementById('recordChannel');
-            const scrollTop = document.getElementById('scrollTop');
-            const addChannelForm = document.getElementById('addChannelForm');
-            const adminPanel = document.getElementById('adminPanel');
-            const adminLink = document.getElementById('adminLink');
-            const adminModal = document.getElementById('adminModal');
-            const adminLoginForm = document.getElementById('adminLoginForm');
-            const adultContentModal = document.getElementById('adultContentModal');
-            const confirmAdult = document.getElementById('confirmAdult');
-            const logoutAdmin = document.getElementById('logoutAdmin');
-            const channelPasswordModal = document.getElementById('channelPasswordModal');
-            const confirmChannelPassword = document.getElementById('confirmChannelPassword');
-            const confirmChannelPasswordBtn = document.getElementById('confirmChannelPasswordBtn');
-            const channelPassword = document.getElementById('channelPassword');
-            const profileLink = document.getElementById('profileLink');
-            const profileModal = document.getElementById('profileModal');
-            const profileForm = document.getElementById('profileForm');
-            const searchInput = document.getElementById('searchInput');
-
-            // Add null checks for all elements
-            if (!channelGrid || !videoPlayer || !videoElement || !closePlayer || !recordChannel || 
-                !scrollTop || !addChannelForm || !adminPanel || !adminLink || !adminModal || 
-                !adminLoginForm || !adultContentModal || !confirmAdult || !logoutAdmin || 
-                !channelPasswordModal || !confirmChannelPassword || !confirmChannelPasswordBtn || 
-                !channelPassword || !profileLink || !profileModal || !profileForm || !searchInput) {
-                console.error('One or more required elements are missing from the DOM');
-                return;
-            }
-
-            function generateChannelCode() {
-                return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            }
-
-            function populateChannelGrid(filteredChannels = channels) {
-                channelGrid.innerHTML = '';
-                filteredChannels.forEach(channel => {
-                    if (channel.category === 'adulto' && !isAdultConfirmed) {
-                        return;
-                    }
-                    const channelCard = document.createElement('div');
-                    channelCard.className = 'channel-card';
-                    channelCard.innerHTML = `
-                        <img src="${channel.thumbnail}" alt="${channel.name}" width="200" height="120">
-                        <div class="info">
-                            <h3>${channel.name}</h3>
-                            <p>Categoria: ${channel.category}</p>
-                            <button class="play-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mt-2" data-url="${channel.url}" data-category="${channel.category}">
-                                Assistir
-                            </button>
-                            ${isAdminLoggedIn ? `
-                                <button class="edit-btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2" data-code="${channel.code}">
-                                    Editar
-                                </button>
-                                <button class="delete-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mt-2" data-code="${channel.code}">
-                                    Excluir
-                                </button>
-                            ` : ''}
-                        </div>
-                    `;
-                    channelGrid.appendChild(channelCard);
+        playButton.addEventListener('click', () => {
+            // Adicionando o proxy CORS Anywhere
+            const streamUrl = `https://cors-anywhere.herokuapp.com/${streamUrlInput.value}`;
+            
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(streamUrl);
+                hls.attachMedia(video);
+                video.play();
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = streamUrl;
+                video.addEventListener('loadedmetadata', () => {
+                    video.play();
                 });
+            } else {
+                alert('Seu navegador não suporta HLS.');
             }
-
-            function initPlayer(url) {
-                if (Hls.isSupported()) {
-                    const hls = new Hls();
-                    hls.loadSource(url);
-                    hls.attachMedia(videoElement);
-                } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-                    videoElement.src = url;
-                }
-            }
-
-            searchInput.addEventListener('input', () => {
-                const searchTerm = searchInput.value.toLowerCase();
-                const filteredChannels = channels.filter(channel => 
-                    channel.name.toLowerCase().includes(searchTerm) ||
-                    channel.category.toLowerCase().includes(searchTerm)
-                );
-                populateChannelGrid(filteredChannels);
-            });
-
-            channelGrid.addEventListener('click', (e) => {
-                if (e.target.classList.contains('play-btn')) {
-                    const url = e.target.dataset.url;
-                    const category = e.target.dataset.category;
-                    if (category === 'adulto' && !isAdultConfirmed) {
-                        adultContentModal.style.display = 'block';
-                        confirmAdult.onclick = () => {
-                            isAdultConfirmed = true;
-                            adultContentModal.style.display = 'none';
-                            initPlayer(url);
-                            videoPlayer.style.display = 'block';
-                        };
-                    } else {
-                        initPlayer(url);
-                        videoPlayer.style.display = 'block';
-                    }
-                } else if (e.target.classList.contains('edit-btn')) {
-                    showPasswordConfirmation('edit', e.target.dataset.code);
-                } else if (e.target.classList.contains('delete-btn')) {
-                    showPasswordConfirmation('delete', e.target.dataset.code);
-                }
-            });
-
-            function showPasswordConfirmation(operation, channelCode) {
-                currentOperation = operation;
-                currentChannelCode = channelCode;
-                channelPasswordModal.style.display = 'block';
-            }
-
-            confirmChannelPasswordBtn.addEventListener('click', () => {
-                if (confirmChannelPassword.value === channelPassword.value) {
-                    channelPasswordModal.style.display = 'none';
-                    if (currentOperation === 'edit') {
-                        editChannel(currentChannelCode);
-                    } else if (currentOperation === 'delete') {
-                        deleteChannel(currentChannelCode);
-                    }
-                } else {
-                    alert('Senha incorreta!');
-                }
-                confirmChannelPassword.value = '';
-            });
-
-            function editChannel(channelCode) {
-                const channel = channels.find(ch => ch.code === channelCode);
-                if (channel) {
-                    document.getElementById('channelName').value = channel.name;
-                    document.getElementById('channelUrl').value = channel.url;
-                    document.getElementById('channelThumbnail').value = channel.thumbnail;
-                    document.getElementById('channelCategory').value = channel.category;
-
-                    addChannelForm.onsubmit = (e) => {
-                        e.preventDefault();
-                        channel.name = document.getElementById('channelName').value;
-                        channel.url = document.getElementById('channelUrl').value;
-                        channel.thumbnail = document.getElementById('channelThumbnail').value;
-                        channel.category = document.getElementById('channelCategory').value;
-
-                        localStorage.setItem('channels', JSON.stringify(channels));
-                        populateChannelGrid();
-                        addChannelForm.reset();
-                        addChannelForm.onsubmit = addNewChannel; // Reset to add new channel function
-                    };
-                }
-            }
-
-            function addNewChannel(e) {
-                e.preventDefault();
-                const name = document.getElementById('channelName').value;
-                const url = document.getElementById('channelUrl').value;
-                const thumbnail = document.getElementById('channelThumbnail').value;
-                const category = document.getElementById('channelCategory').value;
-                const code = generateChannelCode();
-
-                const newChannel = { name, url, thumbnail, category, code };
-                channels.push(newChannel);
-                localStorage.setItem('channels', JSON.stringify(channels));
-                populateChannelGrid();
-                addChannelForm.reset();
-            }
-
-            function deleteChannel(channelCode) {
-                if (confirm('Tem certeza que deseja excluir este canal?')) {
-                    channels = channels.filter(ch => ch.code !== channelCode);
-                    localStorage.setItem('channels', JSON.stringify(channels));
-                    populateChannelGrid();
-                }
-            }
-
-            if (closePlayer) {
-                closePlayer.addEventListener('click', () => {
-                    videoPlayer.style.display = 'none';
-                    videoElement.pause();
-                });
-            }
-
-            if (recordChannel) {
-                recordChannel.addEventListener('click', () => {
-                    console.log('Recording channel...');
-                });
-            }
-
-            if (scrollTop) {
-                window.addEventListener('scroll', () => {
-                    if (window.pageYOffset > 300) {
-                        scrollTop.style.display = 'block';
-                    } else {
-                        scrollTop.style.display = 'none';
-                    }
-                });
-
-                scrollTop.addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            }
-
-            if (addChannelForm) {
-                addChannelForm.addEventListener('submit', addNewChannel);
-            }
-
-            if (adminLink) {
-                adminLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (isAdminLoggedIn) {
-                        adminPanel.style.display = 'block';
-                    } else {
-                        adminModal.style.display = 'block';
-                    }
-                });
-            }
-
-            if (adminLoginForm) {
-                adminLoginForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const password = document.getElementById('adminPassword').value;
-                    if (password === adminPassword) {
-                        isAdminLoggedIn = true;
-                        adminModal.style.display = 'none';
-                        adminPanel.style.display = 'block';
-                    } else {
-                        alert('Senha incorreta!');
-                    }
-                });
-            }
-
-            if (logoutAdmin) {
-                logoutAdmin.addEventListener('click', () => {
-                    isAdminLoggedIn = false;
-                    adminPanel.style.display = 'none';
-                    populateChannelGrid(); 
-                });
-            }
-
-            profileLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                profileModal.style.display = 'block';
-            });
-
-            profileForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const userName = document.getElementById('userName').value;
-                const userEmail = document.getElementById('userEmail').value;
-                localStorage.setItem('userName', userName);
-                localStorage.setItem('userEmail', userEmail);
-                alert('Perfil salvo com sucesso!');
-                profileModal.style.display = 'none';
-            });
-
-            document.querySelectorAll('.close').forEach(closeBtn => {
-                closeBtn.onclick = function() {
-                    this.closest('.modal').style.display = 'none';
-                }
-            });
-
-            window.onclick = function(event) {
-                if (event.target.classList.contains('modal')) {
-                    event.target.style.display = "none";
-                }
-            }
-
-            populateChannelGrid();
         });
     </script>
-</body></html>
+</body>
+</html>
+```
+
