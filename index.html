@@ -1,91 +1,1819 @@
+<!DOCTYPE html><html><head><base href="https://freestream.io/">
+  <meta charset="UTF-8">
+  <title id="page-title">Canais de TV Agora</title>
+  <link id="favicon" rel="icon" type="image/svg+xml" href="#">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.2/plyr.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.2/plyr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dashjs/dist/dash.all.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reprodutor HLS</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background-color: #f4f4f4;
+    :root {
+      --primary-color: #BB86FC;
+      --primary-color-rgb: 187, 134, 252;
+      --secondary-color: #03DAC6;
+      --background-gradient: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+      --surface-color: #1E1E1E;
+      --text-color: #E1E1E1;
+      --card-background: rgba(30, 30, 30, 0.8);
+      --title-color: #FF4081;
+      --description-color: #FFFF00;
+      --error-color: #FF3D00;
+      --button-color: #6200EE;
+      --button-hover-color: #3700B3;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding-top: 60px; 
+      padding-bottom: 40px; 
+      background: var(--background-gradient);
+      color: var(--text-color);
+      transition: background-color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #main-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background-color: var(--surface-color);
+      z-index: 1000;
+    }
+
+    .container {
+      flex: 1;
+      margin-top: 60px; 
+      padding-bottom: 40px; 
+    }
+
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: calc(100%);
+      z-index: -1;
+      overflow: hidden;
+      background: var(--background-gradient);
+    }
+
+    .search-container {
+      background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(60, 60, 60, 0.9));
+      border-radius: 0 0 25px 25px;
+      padding: 15px 25px;
+      margin-bottom: 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .player-and-tab-container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      gap: 0; 
+    }
+
+    .content-container {
+      flex: 2;
+      margin-right: 1em;
+      width: 100%;
+      position: relative;
+      margin-bottom: 1em;
+    }
+
+    .left-tab-container {
+      display: flex;
+      flex-direction: row;
+      background-color: var(--surface-color);
+      border-radius: 8px;
+      overflow: hidden;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .left-tab-header {
+      background-color: var(--button-color);
+      color: white;
+      padding: 10px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      min-width: 40px;
+    }
+
+    .left-tab-content {
+      width: 100%;
+    }
+
+    .player-container {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .channel-list-sidebar {
+      flex: 1;
+      margin-bottom: 1em;
+      flex-direction: column;
+      background-color: #1E1E1E;
+      border: none; 
+    }
+
+    .toggle-sidebar {
+      display: none;
+    }
+
+    .vertical-tab {
+      height: 100%;
+      overflow-y: auto;
+      padding: 20px;
+      width: 100%;
+      box-sizing: border-box;
+      background-color: #1E1E1E; 
+      border: none; 
+    }
+
+    .vertical-tab h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .tab-button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 5px;
+      background-color: rgba(187, 134, 252, 0.1);
+      color: var(--primary-color);
+      border: none;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 700;
+      font-size: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-button:hover {
+      background-color: rgba(var(--primary-color-rgb), 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 20px;
+      background-color: var(--surface-color);
+      border-radius: 15px; 
+      overflow: hidden; 
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .plyr {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .scheduling-container {
+      background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(30, 30, 30, 0.95));
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+      margin-top: 20px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .scheduling-container h3 {
+      text-align: center;
+      font-size: 1.5em;
+      margin: 0 0 20px;
+      color: var(--primary-color);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .scheduling-container input {
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      background-color: rgba(255,255,255,0.1);
+      color: var(--text-color);
+      text-align: center;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .scheduling-container button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .scheduling-container #scheduledInfo {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: rgba(187, 134, 252, 0.1);
+      border-radius: 5px;
+      text-align: center;
+      font-size: 12px;
+      color: #03DAC6;
+    }
+
+    @media (max-width: 768px) {
+      .plyr__control svg {
+        width: 36px;
+        height: 36px;
+      }
+
+      .plyr__control--overlaid svg {
+        width: 52px;
+        height: 52px;
+      }
+
+      .plyr__control--overlaid {
+        padding: 32px;
+      }
+
+      .player-and-tab-container {
+        flex-direction: column;
+      }
+      
+      .content-container {
+        margin-right: 0;
+        margin-bottom: 1em;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    * {
+      scrollbar-width: none;
+    }
+
+    * {
+      -ms-overflow-style: none;
+    }
+
+    .header-title {
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+
+    .datetime-container {
+      font-size: 0.9em;
+    }
+
+    #datetime {
+      font-size: 1em;
+      padding: 6px 10px;
+    }
+
+    .time-format-toggle {
+      margin-top: 5px;
+    }
+
+    .channel-category {
+      margin-bottom: 20px;
+    }
+
+    .category-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.5em;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      padding-bottom: 10px;
+      position: relative;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .channel-count {
+      font-size: 0.6em;
+      color: var(--secondary-color);
+      padding: 3px 8px;
+      background-color: rgba(3, 218, 198, 0.1);
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 5px;
+    }
+
+    @media (max-width: 576px) {
+      .category-header {
+        font-size: 1.3em;
+      }
+
+      .channel-count {
+        font-size: 0.5em;
+        padding: 2px 6px;
+      }
+    }
+
+    .category-channels {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .category-header.highlight {
+      background-color: rgba(3, 218, 198, 0.3);
+      color: #ffffff;
+      animation: pulse 1.5s infinite;
+    }
+
+    @media (min-width: 768px) {
+      .player-and-tab-container {
+        flex-direction: row;
+      }
+
+      .content-container {
+        flex: 2;
+        margin-right: 1em;
+      }
+
+      .channel-list-sidebar {
+        flex: 1;
+      }
+    }
+
+    #main-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--surface-color);
+      color: var(--text-color);
+      text-align: center;
+      padding: 10px;
+      z-index: 1000;
+      border-top: 1px solid var(--primary-color);
+    }
+
+    #main-footer p {
+      margin: 0;
+      font-size: 0.9em;
+    }
+
+    #secondary-footer {
+      background: linear-gradient(135deg, #2a2a2a 0%, #3c3c3c 100%);
+      color: #e0e0e0;
+      text-align: center;
+      padding: 20px;
+      border-top: 2px solid var(--secondary-color);
+    }
+
+    #secondary-footer h4 {
+      color: var(--primary-color);
+    }
+  </style>
+  <script>
+    const colors = [
+      "red", "green", "yellow", "orange", "purple", "pink", "brown", "gray", "black", "white",
+      "maroon", "turquoise", "gold", "silver", "beige", "lavender", "salmon", "olive", "cyan", "magenta",
+      "coral", "almond", "emerald", "lavender", "fuchsia", "mustard", "pistachio", "peach", "caramel", "amber",
+      "burgundy", "chartreuse", "sapphire", "olive", "oldgold", "terracotta", "khaki", "purple", "pearl", "sepia",
+      "indigo", "lavenderlight", "chocolate", "skyblue", "limegreen", "ivory", "fandango", "crimson", "teal", "slategray",
+      "alabaster", "ruby", "jambo", "gris", "seagreen", "fandango", "orchid", "coffee", "quartz"
+    ];
+    
+    let currentColorIndex = 0;
+
+    function createFavicon() {
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+          <rect x="10" y="20" width="80" height="60" rx="5" fill="#333"/>
+          <rect id="screen" x="15" y="25" width="70" height="50" fill="${colors[currentColorIndex]}"/>
+          <circle cx="50" cy="85" r="5" fill="#666"/>
+        </svg>
+      `;
+      const favicon = document.getElementById('favicon');
+      favicon.href = 'data:image/svg+xml;base64,' + btoa(svg);
+    }
+    
+    function changeColor() {
+      currentColorIndex = (currentColorIndex + 1) % colors.length;
+      createFavicon();
+    }
+    
+    createFavicon();
+    setInterval(changeColor, 3000);
+
+    function resetSidebarTimer() {
+      clearTimeout(sidebarTimer);
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.code === 'Space' && event.target.tagName !== 'INPUT') {
+        event.preventDefault();
+        
+        const mainPlayer = document.getElementById('main-player');
+        if (mainPlayer && mainPlayer.plyr) {
+          if (mainPlayer.plyr.paused) {
+            mainPlayer.plyr.play();
+          } else {
+            mainPlayer.plyr.pause();
+          }
         }
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 15px;
-            text-align: center;
+      }
+    });
+
+    function sortChannelTabs() {
+      const categories = document.querySelectorAll('.channel-category');
+      
+      categories.forEach(category => {
+        const channelButtons = Array.from(category.querySelectorAll('.tab-button'));
+        channelButtons.sort((a, b) => a.textContent.localeCompare(b.textContent));
+        
+        const categoryChannels = category.querySelector('.category-channels');
+        channelButtons.forEach(button => categoryChannels.appendChild(button));
+      });
+    }
+
+    function searchChannel() {
+      const searchTerm = channelSearch.value.trim().toLowerCase();
+      
+      if (searchTerm) {
+        const channels = Array.from(tabButtons).map(button => ({
+          element: button,
+          name: button.textContent.trim().toLowerCase(),
+          dataTab: button.getAttribute('data-tab')
+        }));
+        
+        const categories = Array.from(document.querySelectorAll('.category-header')).map(header => ({
+          element: header,
+          name: header.textContent.trim().toLowerCase()
+        }));
+
+        channels.forEach(channel => channel.element.classList.remove('highlight'));
+        categories.forEach(category => category.element.classList.remove('highlight'));
+        
+        const foundChannel = channels.find(channel => 
+          channel.name.includes(searchTerm) || channel.dataTab.includes(searchTerm)
+        );
+
+        const foundCategory = categories.find(category => 
+          category.name.includes(searchTerm)
+        );
+
+        if (foundChannel) {
+          foundChannel.element.classList.add('highlight');
+          foundChannel.element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          
+          setTimeout(() => {
+            foundChannel.element.click();
+          }, 500);
+        } else if (foundCategory) {
+          foundCategory.element.classList.add('highlight');
+          foundCategory.element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          alert('Canal ou categoria não encontrada');
         }
-        .container {
-            display: flex;
-            flex: 1;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        video {
-            width: 100%;
-            max-width: 800px;
-            border: 1px solid #ccc;
-            background: black;
-        }
-        .controls {
-            margin-top: 15px;
-        }
-        .controls input {
-            width: calc(100% - 100px);
-            padding: 10px;
-        }
-        .controls button {
-            padding: 10px 15px;
-            margin-left: 10px;
-        }
-    </style>
+      }
+    }
+
+    function removeHighlight() {
+      const highlightedChannel = document.querySelector('.tab-button.highlight');
+      if (highlightedChannel) {
+        highlightedChannel.classList.remove('highlight');
+      }
+      const highlightedCategory = document.querySelector('.category-header.highlight');
+      if (highlightedCategory) {
+        highlightedCategory.classList.remove('highlight');
+      }
+    }
+
+    function updateCurrentChannel(channelName) {
+      document.getElementById('current-channel').textContent = channelName;
+    }
+
+    function handleResponsiveLayout() {
+      const playerContainer = document.querySelector('.player-and-tab-container');
+      const sidebar = document.querySelector('.channel-list-sidebar');
+      
+      if (window.innerWidth >= 768) {
+        playerContainer.style.flexDirection = 'row';
+        sidebar.style.marginLeft = '1em';
+      } else {
+        playerContainer.style.flexDirection = 'column';
+        sidebar.style.marginLeft = '0';
+      }
+    }
+
+    window.addEventListener('resize', handleResponsiveLayout);
+    handleResponsiveLayout();
+  </script>
 </head>
 <body>
-    <header>
-        <h1>Reprodutor de Stream HLS</h1>
-    </header>
-    <div class="container">
-        <video id="videoElement" controls></video>
-        <div class="controls">
-            <label for="streamUrl">Insira a URL do stream .m3u8:</label>
-            <input type="text" id="streamUrl" value="http://212.102.60.247//live/889281840/Z451m1324a/272799.m3u8?token=TxsLVBJbEAlGAQAEXgVSAFEBUwFSUwhSAAgABFJQUVwEDgIDUQMDClBGSBYVRUVUAwhuXAUTAgYHClIJXBlDTEdcEWoIVxAJRlBVAVAGBgFASRNBCFxdFgoISRIVXAUbDhtSB1YDABFIRgFMElRFXwMJblEER1FXVRpfXhBZDRUWVg1qBVZfUgoARg5EARUdQAxCRUMLVkFcVEkSB1wVS1VNBhdbEQMGU1BGGERSWEQMEUNMQwsadmIaSRIATRVcWkoKWg8RCBEJVxEMRB0VWBE6Q1ASRUpRUVUAQkcPQwkWFUFYAEttUAsKClEFRV5eDBYTD0MAGhgSVQpeDEEOS2tJClFDCRABV1BSBERM" readonly>
-            <button id="playButton">Reproduzir</button>
+  <div id="main-header">
+  <div class="datetime-container" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #111111 0%, #1c1c1c 100%); padding: 10px 20px; width: 100%; box-sizing: border-box; border-radius: 0 0 15px 15px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5); border-bottom: 2px solid var(--primary-color);">
+  <div style="flex: 1; display: flex; justify-content: space-between; align-items: center;">
+    <div class="current-channel-container" style="flex: 1; text-align: center; display: flex; flex-direction: column;">
+      <span style="font-size: 1em; color: var(--secondary-color); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; display: block; margin-bottom: 2px; margin-top: -5px;">CANAL ATUAL</span>
+      <span id="current-channel" style="display: block; font-size: 1.5em; font-weight: bold; color: var(--primary-color); text-shadow: 0 0 8px rgba(187, 134, 252, 0.6); transition: all 0.3s ease; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 5px;"></span>
+    </div>
+    
+    <div style="flex: 1; text-align: center; display: flex; justify-content: center; align-items: center;">
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+  <span class="datetime-label" style="font-size: 1em; color: var(--secondary-color); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; display: block; margin-bottom: 3px; margin-top: 5px;">Data e Hora</span>
+  <div id="datetime" class="datetime" style="font-size: 1.3em; font-weight: bold; color: var(--primary-color); transition: all 0.3s ease; text-shadow: 0 0 8px rgba(187, 134, 252, 0.6);"></div>
+</div>
+    </div>
+    
+    <div class="time-format-toggle" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+  <span class="toggle-label" style="font-size: 1em; color: var(--secondary-color); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 5px; margin-top: -5px;">Formato de Hora</span>
+  <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
+    <span style="font-size: 0.7em; color: var(--text-color); margin-right: 8px;">12 Horas</span>
+    <label class="switch" style="position: relative; display: inline-block; width: 48px; height: 26px; background-color: rgba(255, 255, 255, 0.1); border-radius: 26px; box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2); transition: all 0.3s ease;">
+      <input type="checkbox" id="timeFormatToggle" style="opacity: 0; width: 0; height: 0;">
+      <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #808080; transition: .4s; border-radius: 26px; box-shadow: 0 0 3px rgba(3, 218, 198, 0.5); width: 48px; height: 26px;">
+        <span>
+          <button id="toggleButton" style="position: absolute; width: 48px; height: 26px; background-color: #808080; border: none; border-radius: 26px; cursor: pointer; outline: none; transition: .4s; box-shadow: 0 0 8px rgba(3, 218, 198, 0.5);">
+            <span style="position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+          </button>
+          <script>
+            const toggleButton = document.getElementById('toggleButton');
+            const toggleSpan = toggleButton.querySelector('span');
+            let isToggled = false;
+
+            toggleButton.addEventListener('click', () => {
+              isToggled = !isToggled;
+              if (isToggled) {
+                toggleButton.style.backgroundColor = '#4CAF50';
+                toggleSpan.style.transform = 'translateX(22px)';
+                use24HourFormat = true;
+              } else {
+                toggleButton.style.backgroundColor = '#808080';
+                toggleSpan.style.transform = 'translateX(0)';
+                use24HourFormat = false;
+              }
+              updateDateTime();
+            });
+
+            // Add focus styles
+            toggleButton.addEventListener('focus', () => {
+              toggleButton.style.outline = '2px solid white';
+              toggleButton.style.boxShadow = '0 0 12px rgba(3, 218, 198, 0.7)';
+            });
+
+            toggleButton.addEventListener('blur', () => {
+              toggleButton.style.outline = 'none';
+              toggleButton.style.boxShadow = '0 0 8px rgba(3, 218, 198, 0.5)';
+            });
+
+            // Add hover effect with zoom
+            toggleButton.addEventListener('mouseenter', () => {
+              toggleButton.style.transform = 'scale(1.05)';
+              toggleButton.style.boxShadow = '0 0 12px rgba(3, 218, 198, 0.7)';
+            });
+
+            toggleButton.addEventListener('mouseleave', () => {
+              toggleButton.style.transform = 'scale(1)';
+              toggleButton.style.boxShadow = '0 0 8px rgba(3, 218, 198, 0.5)';
+            });
+          </script>
+        </span>
+      </span>
+    </label>
+    <span style="font-size: 0.7em; color: var(--text-color); margin-left: 8px;">24 Horas</span>
+  </div>
+</div>
+  </div>
+</div>
+</div>
+  <div class="container">
+    <div class="player-and-tab-container">
+      <div class="content-container">
+  <div class="tab-content active" id="player-content" style="border-radius: 15px; overflow: hidden; margin-left: 20px; background: rgba(20, 20, 20, 0.95); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+  <div class="player-container">
+  <style>
+    .player-container {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      overflow: hidden;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .player-container:hover {
+      transform: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .plyr {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 15px;
+    }
+
+    .plyr__controls {
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%) !important;
+      padding: 20px !important;
+      justify-content: center !important;
+    }
+
+    .plyr__control {
+      background: rgba(255,255,255,0.1) !important;
+      border-radius: 50% !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .plyr__control:hover {
+      background: rgba(255,255,255,0.2) !important;
+      transform: scale(1.1) !important;
+    }
+
+    .plyr__progress {
+      --plyr-progress-loading-background: rgba(255,255,255,0.2) !important;
+      --plyr-progress-loading-size: 5px !important;
+    }
+
+    .plyr__volume {
+      --plyr-range-thumb-background: var(--secondary-color) !important;
+      --plyr-range-thumb-height: 15px !important;
+      --plyr-range-thumb-width: 15px !important;
+      --plyr-range-track-height: 5px !important;
+    }
+
+    .plyr--full-ui input[type=range] {
+      color: var(--secondary-color) !important;
+    }
+
+    .plyr__control--overlaid {
+      background: var(--primary-color) !important;
+      padding: 30px !important;
+      opacity: 0.9 !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .plyr__control--overlaid:hover {
+      background: var(--secondary-color) !important;
+      opacity: 1 !important;
+      transform: scale(1.1) !important;
+    }
+    
+    .plyr__controls > * {
+      margin: 0 5px !important;
+    }
+    
+    .plyr__control svg {
+      width: 36px !important; /* Increased from 32px */
+      height: 36px !important; /* Increased from 32px */
+    }
+
+    .plyr__control--overlaid svg {
+      width: 40px !important; /* Increased from default */
+      height: 40px !important; /* Increased from default */
+    }
+  </style>
+  <video id="main-player" playsinline="" controls="">
+    <source type="application/x-mpegURL" src="">
+  </video>
+</div>
+  <div style="padding: 20px; background: rgba(187, 134, 252, 0.1); border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; margin-top: 15px; border: 2px solid var(--primary-color);">
+  <p style="margin: 0; font-size: 1.1em; color: var(--text-color); font-weight: 500; letter-spacing: 0.5px; line-height: 1.6;">
+    <span style="display: inline-block; background: var(--primary-color); color: #000; padding: 4px 10px; border-radius: 20px; margin-right: 10px; font-weight: 700; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: pulse 1.5s infinite;">IMPORTANTE</span>
+    OS ANÚNCIOS SÃO ESSENCIAIS PARA MANTER O SITE FUNCIONANDO E OFERECER CONTEÚDO GRATUITO DE QUALIDADE.
+  </p>
+  <div style="width: 80%; height: 2px; background: var(--primary-color); margin: 15px auto 0;"></div>
+</div>
+  <div></div>
+  <!-- Novo tutorial adicionado abaixo do player -->
+  <div class="tutorial-container" style="background: rgba(20, 20, 20, 0.95); padding: 30px; margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-left: 0; margin-right: 0; width: 100%; box-sizing: border-box;">
+  <h3 style="text-align: center; font-size: 2em; margin: 40px 0 30px; color: var(--primary-color); text-transform: uppercase; letter-spacing: 6px; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); padding-bottom: 15px; position: relative; font-family: 'Montserrat', sans-serif;">
+  TUTORIAL
+  <span style="display: block; width: 100%; height: 4px; background: var(--primary-color); margin: 15px auto 0;"></span>
+</h3>
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; text-align: center; font-size: 1.1em; background: #111111; padding: 20px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);">
+  <div style="flex: 1 1 300px; margin: 10px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; transition: transform 0.3s ease;">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <h4 style="color: var(--secondary-color); font-size: 1.4em; margin-bottom: 10px; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+      Pesquisa de Canais
+    </h4>
+    <p style="color: var(--text-color); font-size: 1.1em; line-height: 1.6; font-family: 'Roboto', sans-serif;">
+      Digite o nome do canal desejado na barra de pesquisa no topo da página. Pressione Enter ou clique no botão de busca para encontrar o canal rapidamente.
+    </p>
+  </div>
+  <div style="flex: 1 1 300px; margin: 10px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; transition: transform 0.3s ease;">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+    <h4 style="color: var(--secondary-color); font-size: 1.4em; margin-bottom: 10px; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+      Busca por Voz
+    </h4>
+    <p style="color: var(--text-color); font-size: 1.1em; line-height: 1.6; font-family: 'Roboto', sans-serif;">
+      Use o botão de comando de voz (ícone de microfone) para buscar canais falando o nome. Ou digite o nome do canal na barra de pesquisa e pressione Enter ou clique no botão de busca.
+    </p>
+  </div>
+  <div style="flex: 1 1 300px; margin: 10px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; transition: transform 0.3s ease;">
+      <line x1="8" y1="6" x2="21" y2="6"></line>
+      <line x1="8" y1="12" x2="21" y2="12"></line>
+      <line x1="8" y1="18" x2="21" y2="18"></line>
+      <line x1="3" y1="6" x2="3.01" y2="6"></line>
+      <line x1="3" y1="12" x2="3.01" y2="12"></line>
+      <line x1="3" y1="18" x2="3.01" y2="18"></line>
+    </svg>
+    <h4 style="color: var(--secondary-color); font-size: 1.4em; margin-bottom: 10px; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+      Navegação por Categorias
+    </h4>
+    <p style="color: var(--text-color); font-size: 1.1em; line-height: 1.6; font-family: 'Roboto', sans-serif;">
+      Explore os canais disponíveis na barra lateral. Estão organizados por categorias para facilitar sua busca. É simples e rápido!
+    </p>
+  </div>
+  <div style="flex: 1 1 300px; margin: 10px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; transition: transform 0.3s ease;">
+      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </svg>
+    <h4 style="color: var(--secondary-color); font-size: 1.4em; margin-bottom: 10px; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+      Reprodução de Conteúdo
+    </h4>
+    <p style="color: var(--text-color); font-size: 1.1em; line-height: 1.6; font-family: 'Roboto', sans-serif;">Selecione um canal para iniciar a transmissão instantaneamente.</p>
+  </div>
+  <div style="flex: 1 1 300px; margin: 10px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; transition: transform 0.3s ease;">
+      <circle cx="12" cy="12" r="10"></circle>
+      <polygon points="10 8 16 12 10 16 10 8"></polygon>
+    </svg>
+    <h4 style="color: var(--secondary-color); font-size: 1.4em; margin-bottom: 10px; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+      Controles de Reprodução
+    </h4>
+    <p style="color: var(--text-color); font-size: 1.1em; line-height: 1.6; font-family: 'Roboto', sans-serif;">
+      Use os controles do player para ajustar o volume, colocar em tela cheia, modo picture-in-picture. É fácil e rápido!
+    </p>
+  </div>
+  <div style="flex: 1 1 300px; margin: 10px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; transition: transform 0.3s ease;">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+    </svg>
+    <h4 style="color: var(--secondary-color); font-size: 1.4em; margin-bottom: 10px; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+      Agendamento
+    </h4>
+    <p style="color: var(--text-color); font-size: 1.1em; line-height: 1.6; font-family: 'Roboto', sans-serif;">Programe a exibição de canais utilizando o formulário de agendamento na barra lateral.</p>
+  </div>
+  <div style="flex: 1 1 300px; margin: 10px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; transition: transform 0.3s ease;">
+      <circle cx="12" cy="12" r="10"></circle>
+      <polyline points="12 6 12 12 16 14"></polyline>
+    </svg>
+    <h4 style="color: var(--secondary-color); font-size: 1.4em; margin-bottom: 10px; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+      Informações em Tempo Real
+    </h4>
+    <p style="color: var(--text-color); font-size: 1.1em; line-height: 1.6; font-family: 'Roboto', sans-serif;">Visualize o canal atual e o horário no cabeçalho da página para manter-se informado.</p>
+  </div>
+  <div style="flex: 1 1 300px; margin: 10px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; transition: transform 0.3s ease;">
+      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+    </svg>
+    <h4 style="color: var(--secondary-color); font-size: 1.4em; margin-bottom: 10px; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+      Tela Cheia
+    </h4>
+    <p style="color: var(--text-color); font-size: 1.1em; line-height: 1.6; font-family: 'Roboto', sans-serif;">Clique duas vezes no player para alternar entre o modo de tela cheia e normal.</p>
+  </div>
+</div>
+  <p style="color: var(--text-color); font-size: 1.1em; line-height: 1.6; margin-top: 20px; text-align: center; font-style: italic;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 10px; transition: all 0.3s ease;">
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="16" x2="12" y2="12"></line>
+    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+  </svg>
+  Para uma experiência otimizada, é recomendado o uso de navegadores modernos e uma conexão estável à internet.
+</p>
+</div>
+</div>
+  
+  <!-- Novo tutorial adicionado abaixo do player -->
+  <div></div>
+</div>
+      <div class="channel-list-sidebar">
+        <div class="vertical-tab" style="margin-left: 0; padding: 20px; width: 100%; box-sizing: border-box; border-radius: 0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background: linear-gradient(to bottom, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.95)); overflow-y: auto; z-index: 1000;">
+          <div style="margin-bottom: 30px; text-align: center;">
+            <div></div>
+          </div>
+          <div class="sidebar-search-container" style="position: static; background: #1E1E1E; padding: 15px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); z-index: 1001; margin-top: -30px; margin-bottom: 20px;">
+  <div style="display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 10px;">
+  <input type="text" id="channelSearch" placeholder="Digite o nome do canal" style="width: 85%; padding: 15px; border-radius: 25px; border: none; background-color: rgba(255,255,255,0.1); color: var(--text-color); text-align: center; outline: none; font-size: 18px; font-weight: 500; letter-spacing: 0.5px; transition: all 0.3s ease; border: 2px solid transparent; box-shadow: 0 0 15px rgba(0,0,0,0.2);" required="" onfocus="this.style.borderColor='var(--primary-color)'; this.style.boxShadow='0 0 15px rgba(187, 134, 252, 0.7)'; this.style.animation='pulse 1.5s infinite';" onblur="this.style.borderColor='transparent'; this.style.boxShadow='0 0 15px rgba(0,0,0,0.2)'; this.style.animation='none';">
+  <div style="display: flex; justify-content: space-between; width: 90%; gap: 10px; margin-top: 10px;">
+  <button id="searchButton" style="flex: 1; padding: 12px 20px; background-color: var(--button-color); color: white; border: none; border-radius: 25px; cursor: pointer; transition: all 0.3s ease, transform 0.2s ease; outline: none; font-size: 18px; white-space: nowrap;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onfocus="this.style.outline='2px solid white'" onblur="this.style.outline='none'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    Buscar
+  </button>
+  <button id="voiceCommandButton" style="flex: 1; padding: 12px 20px; background-color: var(--button-color); color: white; border: none; border-radius: 25px; cursor: pointer; transition: all 0.3s ease, transform 0.1s ease, outline 0.2s ease; outline: none; font-size: 18px; white-space: nowrap;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'" onfocus="this.style.outline='2px solid white'" onblur="this.style.outline='none'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+    Voz
+  </button>
+</div>
+</div>
+</div>
+
+          <div>
+            <h3 style="text-align: center; font-size: 2em; margin: 40px 0 30px; color: var(--primary-color); text-transform: uppercase; letter-spacing: 6px; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); padding-bottom: 15px; position: relative; font-family: 'Montserrat', sans-serif;">
+  LISTA DE CANAIS
+  <span style="display: block; width: 100%; height: 4px; background: var(--primary-color); margin: 15px auto 0;"></span>
+</h3>
+          </div>
+          <div class="channel-buttons-container" style="display: flex; flex-direction: column; gap: 20px; max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 10px; margin-left: 10px; margin-top: 20px; padding-bottom: 300px;">
+  <style>
+    .channel-buttons-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+      padding-right: 10px;
+      margin-left: 10px;
+      padding-bottom: 300px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .channel-buttons-container {
+        max-height: none;
+        overflow-y: visible;
+      }
+    }
+
+    .channel-category {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 576px) {
+      .channel-category {
+        padding: 10px;
+      }
+    }
+
+    .category-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 2.2em; /* Increased from 2em */
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      padding-bottom: 10px;
+      position: relative;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    @media (max-width: 576px) {
+      .category-header {
+        font-size: 2em; /* Increased from 1.8em */
+      }
+    }
+
+    .channel-count {
+      font-size: 0.9em; /* Increased from 0.8em */
+      color: var(--secondary-color);
+      padding: 3px 8px;
+      background-color: rgba(3, 218, 198, 0.1);
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 5px;
+    }
+
+    @media (max-width: 576px) {
+      .channel-count {
+        font-size: 0.8em; /* Increased from 0.7em */
+        padding: 2px 6px;
+      }
+    }
+
+    .category-channels {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    @media (max-width: 576px) {
+      .category-channels {
+        gap: 8px;
+      }
+    }
+
+    .tab-button {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      width: 95%;
+      padding: 16px; /* Increased from 14px */
+      margin-bottom: 8px;
+      background-color: rgba(187, 134, 252, 0.1);
+      color: var(--primary-color);
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 22px; /* Increased from 20px */
+      position: relative;
+      overflow: hidden;
+      transition: none;
+    }
+
+    @media (max-width: 576px) {
+      .tab-button {
+        font-size: 20px; /* Increased from 18px */
+        padding: 14px; /* Increased from 12px */
+        width: 90%;
+      }
+    }
+
+    .tab-button .channel-name {
+      font-size: 30px; /* Increased from 26px */
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 576px) {
+      .tab-button .channel-name {
+        font-size: 28px; /* Increased from 24px */
+      }
+    }
+
+    .tab-button:hover,
+    .tab-button.active {
+      background-color: rgba(3, 218, 198, 0.3);
+      color: #ffffff;
+      animation: pulse 1.5s infinite;
+      box-shadow: 0 0 15px rgba(187, 134, 252, 0.7);
+    }
+
+    .category-header.highlight,
+    .channel-category.highlight {
+      color: #ffffff;
+      background-color: rgba(3, 218, 198, 0.3);
+      padding: 10px;
+      border-radius: 8px;
+      animation: categoryPulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes categoryPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes categoryGlow {
+      from { box-shadow: 0 0 15px rgba(3, 218, 198, 0.3); }
+      to { box-shadow: 0 0 25px rgba(3, 218, 198, 0.5); }
+    }
+  </style>
+
+  <div class="channel-category">
+    <h4 class="category-header">
+      CANAIS ABERTOS
+      <span class="channel-count">9 canais</span>
+    </h4>
+    <div class="category-channels">
+      <button class="tab-button" data-tab="record-news">
+        <span class="channel-name">RECORD NEWS</span>
+      </button>
+      <button class="tab-button" data-tab="sbt-interior">
+        <span class="channel-name">SBT INTERIOR</span>
+      </button>
+      <button class="tab-button" data-tab="tv-brasil">
+        <span class="channel-name">TV BRASIL</span>
+      </button>
+      <button class="tab-button" data-tab="cultura">
+        <span class="channel-name">CULTURA</span>
+      </button>
+      <button class="tab-button" data-tab="rede-minas">
+        <span class="channel-name">REDE MINAS</span>
+      </button>
+      <button class="tab-button" data-tab="tve">
+        <span class="channel-name">TVE</span>
+      </button>
+      <button class="tab-button" data-tab="tv-diario">
+        <span class="channel-name">TV DIÁRIO</span>
+      </button>
+      <button class="tab-button" data-tab="tv-potengi">
+        <span class="channel-name">TV POTENGI</span>
+      </button>
+      <button class="tab-button" data-tab="canal-gov">
+        <span class="channel-name">CANAL GOV</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="channel-category">
+    <h4 class="category-header">
+      FILMES E SÉRIES
+      <span class="channel-count">28 canais</span>
+    </h4>
+    <div class="category-channels">
+      <button class="tab-button" data-tab="gospel-movie-tv">
+        <span class="channel-name">GOSPEL MOVIE TELEVISION</span>
+      </button>
+      <button class="tab-button" data-tab="tela-viva">
+        <span class="channel-name">TELA VIVA</span>
+      </button>
+      <button class="tab-button" data-tab="tv-cine">
+        <span class="channel-name">CLASSIQUE TV</span>
+      </button>
+      <button class="tab-button" data-tab="bons-tempos">
+        <span class="channel-name">CANAL 29</span>
+      </button>
+      <button class="tab-button" data-tab="filmes-online">
+        <span class="channel-name">MOVIE SPHERE</span>
+      </button>
+      <button class="tab-button" data-tab="demais-tv">
+        <span class="channel-name">DEMAIS TV</span>
+      </button>
+      <button class="tab-button" data-tab="tv-aracati">
+        <span class="channel-name">TV ARACATI</span>
+      </button>
+      <button class="tab-button" data-tab="tv-classicos-do-cinema">
+        <span class="channel-name">TV CLÁSSICOS DO CINEMA</span>
+      </button>
+      <button class="tab-button" data-tab="clouding">
+        <span class="channel-name">CLOUDING</span>
+      </button>
+      <button class="tab-button" data-tab="runtime">
+        <span class="channel-name">RUNTIME</span>
+      </button>
+      <button class="tab-button" data-tab="tv-osorio">
+        <span class="channel-name">TV OSÓRIO</span>
+      </button>
+      <button class="tab-button" data-tab="gln-tv">
+        <span class="channel-name">GLN TV</span>
+      </button>
+      <button class="tab-button" data-tab="x-plus">
+        <span class="channel-name">X PLUS</span>
+      </button>
+      <button class="tab-button" data-tab="tv-carioca-internacional">
+        <span class="channel-name">TV CARIOCA INTERNACIONAL</span>
+      </button>
+      <button class="tab-button" data-tab="viva-web">
+        <span class="channel-name">VIVA WEB</span>
+      </button>
+      <button class="tab-button" data-tab="classique-western">
+        <span class="channel-name">CLASSIQUE WESTERN</span>
+      </button>
+      <button class="tab-button" data-tab="grjngo">
+        <span class="channel-name">GRJNGO</span>
+      </button>
+      <button class="tab-button" data-tab="channel-1">
+        <span class="channel-name">CHANNEL 1</span>
+      </button>
+      <button class="tab-button" data-tab="tv-recordacoes-web-ce">
+        <span class="channel-name">TV RECORDAÇÕES WEB CE</span>
+      </button>
+      <button class="tab-button" data-tab="up-webtv">
+        <span class="channel-name">UP WEBTV</span>
+      </button>
+      <div></div>
+      <button class="tab-button" data-tab="sony-one-emocoes">
+        <span class="channel-name">SONY ONE EMOÇÕES</span>
+      </button>
+      <button class="tab-button" data-tab="runtime-comedia">
+        <span class="channel-name">RUNTIME COMÉDIA</span>
+      </button>
+      <button class="tab-button" data-tab="sony-one-classics">
+        <span class="channel-name">SONY ONE CLASSICS</span>
+      </button>
+      <button class="tab-button" data-tab="blits-tv">
+        <span class="channel-name">BLITS TV</span>
+      </button>
+      <button class="tab-button" data-tab="runtime-familia">
+        <span class="channel-name">RUNTIME FAMÍLIA</span>
+      </button>
+      <button class="tab-button" data-tab="rede-qdm">
+        <span class="channel-name">REDE QDM</span>
+      </button>
+      <button class="tab-button" data-tab="runtime-romance">
+        <span class="channel-name">RUNTIME ROMANCE</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="channel-category">
+    <h4 class="category-header">
+      DESENHOS
+      <span class="channel-count">7 canais</span>
+    </h4>
+    <div class="category-channels">
+      <button class="tab-button" data-tab="animax">
+        <span class="channel-name">ANIMAX</span>
+      </button>
+      <button class="tab-button" data-tab="loading">
+        <span class="channel-name">LOADING</span>
+      </button>
+      <button class="tab-button" data-tab="otaku-sign">
+        <span class="channel-name">OTAKU SIGN</span>
+      </button>
+      <button class="tab-button" data-tab="anitv">
+        <span class="channel-name">GEEKDOT</span>
+      </button>
+      <button class="tab-button" data-tab="retro-cartoon">
+        <span class="channel-name">RETRÔ CARTOON</span>
+      </button>
+      <button class="tab-button" data-tab="mi-tv">
+        <span class="channel-name">MI TV</span>
+      </button>
+      <button class="tab-button" data-tab="tv-zyn">
+        <span class="channel-name">TV ZYN</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="channel-category">
+    <h4 class="category-header">
+      VARIEDADES
+      <span class="channel-count">1 canal</span>
+    </h4>
+    <div class="category-channels">
+      <button class="tab-button" data-tab="conectv">
+        <span class="channel-name">CONECTV</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="channel-category">
+    <h4 class="category-header">
+      RELIGIOSO
+      <span class="channel-count">1 canal</span>
+    </h4>
+    <div class="category-channels">
+      <button class="tab-button" data-tab="novo-tempo">
+        <span class="channel-name">NOVO TEMPO</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="channel-category">
+    <h4 class="category-header">
+      MÚSICAS
+      <span class="channel-count">6 canais</span>
+    </h4>
+    <div class="category-channels">
+      <button class="tab-button" data-tab="gospel-music-television">
+        <span class="channel-name">GOSPEL MUSIC TELEVISIÓN</span>
+      </button>
+      <button class="tab-button" data-tab="radio-tv-ximenes-fm">
+        <span class="channel-name">RÁDIO TV XIMENES FM</span>
+      </button>
+      <button class="tab-button" data-tab="tv-uniao">
+        <span class="channel-name">TV UNIÃO</span>
+      </button>
+      <button class="tab-button" data-tab="rede-blitz">
+        <span class="channel-name">REDE BLITZ</span>
+      </button>
+      <button class="tab-button" data-tab="kpop-tv-play">
+        <span class="channel-name">KPOP TV PLAY</span>
+      </button>
+      <button class="tab-button" data-tab="polidoro">
+        <span class="channel-name">POLIDORO</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<div class="scheduling-container" style="background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(30, 30, 30, 0.95)); border-radius: 20px; padding: 40px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); margin: 40px auto; width: 95%; max-width: 600px; box-sizing: border-box;">
+  <h3 style="text-align: center; font-size: 2em; margin: 40px 0 30px; color: var(--primary-color); text-transform: uppercase; letter-spacing: 6px; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); padding-bottom: 15px; position: relative; font-family: 'Montserrat', sans-serif;">
+  AGENDAMENTO
+  <span style="display: block; width: 100%; height: 4px; background: var(--primary-color); margin: 15px auto 0;"></span>
+</h3>
+  <form id="scheduleForm" style="display: flex; flex-direction: column; gap: 25px;">
+  <div class="form-group">
+    <label for="scheduleChannelSearch" style="display: block; margin-bottom: 10px; color: var(--secondary-color); font-size: 1.1em; font-weight: 600; text-align: center; width: 60%; margin-left: 15%;">Nome do Canal</label>
+    <input type="text" id="scheduleChannelSearch" placeholder="Digite o nome do canal" style="width: 90%; padding: 15px; border-radius: 25px; border: none; background-color: rgba(255,255,255,0.1); color: var(--text-color); text-align: center; outline: none; font-size: 18px; font-weight: 500; letter-spacing: 0.5px; transition: all 0.3s ease; border: 2px solid transparent; box-shadow: 0 0 15px rgba(0,0,0,0.2);" required="" onfocus="this.style.borderColor='var(--primary-color)'; this.style.boxShadow='0 0 15px rgba(187, 134, 252, 0.7)'; this.style.animation='pulse 1.5s infinite';" onblur="this.style.borderColor='transparent'; this.style.boxShadow='0 0 15px rgba(0,0,0,0.2)'; this.style.animation='none';">
+  </div>
+  
+  <div class="form-group">
+    <label for="scheduleDate" style="display: block; margin-bottom: 10px; color: var(--secondary-color); font-size: 1.1em; font-weight: 600; text-align: center; width: 60%; margin-left: 15%;">Data</label>
+    <input type="date" id="scheduleDate" required="" style="width: 90%; padding: 15px; border-radius: 25px; border: none; background-color: rgba(255,255,255,0.1); color: var(--text-color); font-size: 18px; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); text-align: center;">
+  </div>
+  
+  <div class="form-group">
+    <label for="scheduleTime" style="display: block; margin-bottom: 10px; color: var(--secondary-color); font-size: 1.1em; font-weight: 600; text-align: center; width: 60%; margin-left: 15%;">Hora</label>
+    <input type="time" id="scheduleTime" required="" style="width: 90%; padding: 15px; border-radius: 25px; border: none; background-color: rgba(255,255,255,0.1); color: var(--text-color); font-size: 18px; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); text-align: center;" placeholder="--:--">
+  </div>
+  
+  <div style="display: flex; flex-direction: column; gap: 15px;">
+    <button type="submit" style="padding: 15px; background-color: var(--button-color); color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 18px; font-weight: bold; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 8px 15px rgba(0,0,0,0.3);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px; vertical-align: middle;">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      Agendar
+    </button>
+    <button type="button" id="clearScheduleButton" style="padding: 15px; background-color: var(--error-color); color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 18px; font-weight: bold; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 8px 15px rgba(0,0,0,0.3);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px; vertical-align: middle;">
+        <path d="M3 6h18"></path>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      </svg>
+      Limpar
+    </button>
+  </div>
+</form>
+  <div id="scheduledInfo" style="margin-top: 30px; padding: 20px; background-color: rgba(187, 134, 252, 0.15); border-radius: 12px; text-align: center; font-size: 18px; color: #03DAC6; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2);"></div>
+</div>
         </div>
     </div>
-
+    <footer id="main-footer" style="background: linear-gradient(135deg, #111111 0%, #1c1c1c 100%); color: var(--text-color); text-align: center; padding: 10px; z-index: 1000; border-top: 2px solid var(--primary-color); box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.7);">
+  <p style="margin: 0; font-size: 0.9em; letter-spacing: 1px; text-transform: uppercase;">© CANAIS DE TV AGORA. TODOS OS DIREITOS RESERVADOS.</p>
+</footer>
     <script>
-        const video = document.getElementById('videoElement');
-        const playButton = document.getElementById('playButton');
-        const streamUrlInput = document.getElementById('streamUrl');
+      function getRandomChannel() {
+        const channels = Array.from(document.querySelectorAll('.tab-button'));
+        return channels[Math.floor(Math.random() * channels.length)].getAttribute('data-tab');
+      }
 
-        playButton.addEventListener('click', () => {
-            // Usando o CORS Anywhere
-            const streamUrl = `https://cors-anywhere.herokuapp.com/${streamUrlInput.value}`;
-            
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(streamUrl);
-                hls.attachMedia(video);
-                video.play();
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = streamUrl;
-                video.addEventListener('loadedmetadata', () => {
-                    video.play();
-                });
-            } else {
-                alert('Seu navegador não suporta HLS.');
-            }
+      function setCurrentChannel(channel) {
+        localStorage.setItem('currentChannel', channel);
+      }
+
+      function getCurrentChannel() {
+        return localStorage.getItem('currentChannel') || 'record-news'; 
+      }
+
+      function sortChannelTabs() {
+        const categories = document.querySelectorAll('.channel-category');
+        
+        categories.forEach(category => {
+          const channelButtons = Array.from(category.querySelectorAll('.tab-button'));
+          channelButtons.sort((a, b) => a.textContent.localeCompare(b.textContent));
+          
+          const categoryChannels = category.querySelector('.category-channels');
+          channelButtons.forEach(button => categoryChannels.appendChild(button));
         });
-    </script>
-</body>
-</html>
-```
+      }
 
+      function findChannelByName(channelName) {
+        const tabButtons = Array.from(document.querySelectorAll('.tab-button'));
+        return tabButtons.find(button => button.textContent.trim().toLowerCase() === channelName.toLowerCase());
+      }
+
+      function updatePageTitle(channelName) {
+        document.getElementById('page-title').textContent = channelName;
+      }
+
+      let use24HourFormat = false;
+      
+      function updateDateTime() {
+        const now = new Date();
+        const options = { 
+          year: 'numeric', 
+          month: '2-digit', 
+          day: '2-digit', 
+          hour: use24HourFormat ? '2-digit' : 'numeric',
+          minute: '2-digit',
+          hour12: !use24HourFormat
+        };
+        let formattedDateTime = now.toLocaleDateString('pt-BR', options).replace(',', '');
+        if (!use24HourFormat) {
+          formattedDateTime = formattedDateTime.replace(/ AM| PM/, ''); 
+        }
+        document.getElementById('datetime').textContent = formattedDateTime;
+      }
+
+      document.addEventListener('DOMContentLoaded', (event) => {
+        const timeFormatToggle = document.getElementById('timeFormatToggle');
+        timeFormatToggle.addEventListener('change', function() {
+          use24HourFormat = this.checked;
+          updateDateTime();
+        });
+
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+      });
+
+      const playerConfig = {
+        controls: ['play', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
+        settings: ['captions', 'quality'],
+        quality: { default: 576, options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240] }
+      };
+
+      const defaultStreamUrl = ""; 
+      const errorMessage = document.getElementById('errorMessage');
+      let wasOffline = false;
+      let hls;
+      let dash;
+
+      let scheduledChannel = null;
+      let scheduledTime = null;
+
+      function scheduleChannel(channel, date, time) {
+        const scheduleDateTime = new Date(date + 'T' + time);
+        scheduledChannel = channel;
+        scheduledTime = scheduleDateTime;
+
+        localStorage.setItem('scheduledChannel', channel);
+        localStorage.setItem('scheduledTime', scheduleDateTime.toISOString());
+
+        updateScheduleInfo();
+        
+        document.getElementById('scheduleChannelSearch').value = '';
+      }
+
+      function updateScheduleInfo() {
+        const scheduledInfo = document.getElementById('scheduledInfo');
+        if (scheduledChannel && scheduledTime) {
+          const formattedDate = scheduledTime.toLocaleDateString('pt-BR');
+          const formattedTime = scheduledTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          const channelButton = document.querySelector(`.tab-button[data-tab="${scheduledChannel}"]`);
+          const channelName = channelButton ? channelButton.textContent.trim() : scheduledChannel.toUpperCase();
+          scheduledInfo.textContent = `Canal ${channelName} agendado para ${formattedDate} às ${formattedTime}`;
+        } else {
+          scheduledInfo.textContent = 'Nenhum agendamento ativo';
+        }
+      }
+
+      function clearSchedule() {
+        scheduledChannel = null;
+        scheduledTime = null;
+        localStorage.removeItem('scheduledChannel');
+        localStorage.removeItem('scheduledTime');
+        
+        document.getElementById('scheduleChannelSearch').value = '';
+        document.getElementById('scheduleDate').value = '';
+        document.getElementById('scheduleTime').value = '';
+        
+        updateScheduleInfo();
+      }
+
+      function checkSchedule() {
+        if (scheduledChannel && scheduledTime) {
+          const now = new Date();
+          if (now >= scheduledTime) {
+            const channelButton = document.querySelector(`.tab-button[data-tab="${scheduledChannel}"]`);
+            if (channelButton) {
+              channelButton.click();
+            }
+            clearSchedule(); 
+          }
+        }
+      }
+
+      const scheduleForm = document.getElementById('scheduleForm');
+      scheduleForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const channelSearch = document.getElementById('scheduleChannelSearch').value;
+        const date = document.getElementById('scheduleDate').value;
+        const time = document.getElementById('scheduleTime').value;
+        
+        const channelButton = findChannelByName(channelSearch);
+        if (channelButton) {
+          const channel = channelButton.getAttribute('data-tab');
+          scheduleChannel(channel, date, time);
+        } else {
+          alert('Canal não encontrado. Por favor, verifique o nome do canal.');
+        }
+      });
+
+      document.getElementById('clearScheduleButton').addEventListener('click', clearSchedule);
+
+      let currentChannel = getCurrentChannel();
+
+      if (!currentChannel) {
+        currentChannel = getRandomChannel();
+        setCurrentChannel(currentChannel);
+      }
+
+      function playCurrentChannel() {
+        const channelButton = document.querySelector(`.tab-button[data-tab="${currentChannel}"]`);
+        if (channelButton) {
+          channelButton.click();
+        } else {
+          const firstChannelButton = document.querySelector('.tab-button');
+          if (firstChannelButton) {
+            firstChannelButton.click();
+          }
+        }
+      }
+
+      const savedChannel = localStorage.getItem('scheduledChannel');
+      const savedTime = localStorage.getItem('scheduledTime');
+      if (savedChannel && savedTime) {
+        scheduledChannel = savedChannel;
+        scheduledTime = new Date(savedTime);
+        updateScheduleInfo();
+      }
+
+      setInterval(checkSchedule, 60000);
+      updateScheduleInfo();
+
+      function initPlayer(videoElement, sourceUrl) {
+        const sourceType = getSourceType(sourceUrl);
+
+        if (sourceType === 'hls' && Hls.isSupported()) {
+          initHlsPlayer(videoElement, sourceUrl);
+        } else if (sourceType === 'dash' && dashjs.supportsMediaSource()) {
+          initDashPlayer(videoElement, sourceUrl);
+        } else if (videoElement.canPlayType('application/vnd.apple.mpegurl') || 
+                   videoElement.canPlayType('application/dash+xml')) {
+          initNativePlayer(videoElement, sourceUrl);
+        } else {
+          console.error('Unsupported video format');
+          errorMessage.textContent = 'Formato de vídeo não suportado';
+          errorMessage.style.display = 'block';
+        }
+      }
+
+      function getSourceType(url) {
+        if (url.includes('.m3u8')) {
+          return 'hls';
+        } else if (url.includes('.mpd')) {
+          return 'dash';
+        } else {
+          return 'unknown';
+        }
+      }
+
+      function initHlsPlayer(videoElement, sourceUrl) {
+        if (videoElement.hls) {
+          videoElement.hls.destroy();
+        }
+        videoElement.hls = new Hls();
+        videoElement.hls.loadSource(sourceUrl);
+        videoElement.hls.attachMedia(videoElement);
+        videoElement.hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        });
+        videoElement.hls.on(Hls.Events.ERROR, function(event, data) {
+          if (data.fatal) {
+            switch(data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.log("Erro de rede, tentando reconectar...");
+                videoElement.hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                console.log("Erro de mídia, tentando recuperar...");
+                videoElement.hls.recoverMediaError();
+                break;
+              default:
+                initPlayer(videoElement, sourceUrl);
+                break;
+            }
+          }
+        });
+      }
+
+      function initDashPlayer(videoElement, sourceUrl) {
+        if (videoElement.dash) {
+          videoElement.dash.reset();
+        }
+        videoElement.dash = dashjs.MediaPlayer().create();
+        videoElement.dash.initialize(videoElement, sourceUrl, false);
+        videoElement.dash.on(dashjs.MediaPlayer.events.ERROR, function(error) {
+          console.error('DASH player error:', error);
+        });
+      }
+
+      function initNativePlayer(videoElement, sourceUrl) {
+        videoElement.src = sourceUrl;
+        videoElement.addEventListener('loadedmetadata', function() {
+        });
+      }
+
+      function checkStreamStatus() {
+        fetch(defaultStreamUrl)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Stream não está disponível');
+            }
+            console.log('Stream está ativo');
+            errorMessage.style.display = 'none';
+          })
+          .catch(error => {
+            console.error('Erro ao verificar o stream:', error);
+            errorMessage.style.display = 'block';
+            video.pause();
+          });
+      }
+
+      function checkInternetConnection() {
+        if (!navigator.onLine) {
+          errorMessage.style.display = 'block';
+          video.pause();
+          wasOffline = true;
+        } else {
+          errorMessage.style.display = 'none';
+          checkStreamStatus();
+          if (wasOffline) {
+            video.play();
+            wasOffline = false;
+          }
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', (event) => {
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        setInterval(checkInternetConnection, 5000);
+
+        sortChannelTabs();
+
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const tabId = button.getAttribute('data-tab');
+            
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            button.classList.add('active');
+            document.getElementById('player-content').classList.add('active');
+
+            updateCurrentChannel(button.textContent.trim());
+
+            updatePageTitle(button.textContent.trim());
+
+            currentChannel = tabId;
+            setCurrentChannel(currentChannel);
+
+            const mainPlayer = document.getElementById('main-player');
+            if (mainPlayer.plyr) {
+              mainPlayer.plyr.pause();
+            } else {
+              mainPlayer.pause();
+            }
+
+            const sourceUrl = getSourceUrlForChannel(tabId);
+            if (!mainPlayer.plyr) {
+              mainPlayer.plyr = new Plyr(mainPlayer, playerConfig);
+            }
+            initPlayer(mainPlayer, sourceUrl);
+            mainPlayer.plyr.play();
+          });
+        });
+
+        playCurrentChannel();
+
+        const channelSearch = document.getElementById('channelSearch');
+        const searchButton = document.getElementById('searchButton');
+        const voiceCommandButton = document.getElementById('voiceCommandButton');
+
+        voiceCommandButton.addEventListener('click', () => {
+          const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+          recognition.lang = 'pt-BR';
+          recognition.start();
+
+          recognition.onresult = function(event) {
+            const voiceCommand = event.results[0][0].transcript.toLowerCase();
+            console.log('Comando de voz:', voiceCommand);
+            
+            const channels = Array.from(tabButtons).map(button => ({
+              name: button.textContent.trim().toLowerCase(),
+              element: button
+            }));
+
+            channels.forEach(channel => channel.element.classList.remove('highlight'));
+
+            const foundChannel = channels.find(channel => channel.name.includes(voiceCommand));
+
+            if (foundChannel) {
+              foundChannel.element.classList.add('highlight');
+              foundChannel.element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              
+              setTimeout(() => {
+                foundChannel.element.click();
+              }, 500);
+            } else {
+              alert('Canal não encontrado');
+            }
+          };
+
+          recognition.onerror = function(event) {
+            console.error('Erro no reconhecimento de voz:', event.error);
+            alert('Erro no reconhecimento de voz. Por favor, tente novamente.');
+          };
+        });
+
+        function searchChannel() {
+          const searchTerm = channelSearch.value.trim().toLowerCase();
+          
+          if (searchTerm) {
+            const channels = Array.from(tabButtons).map(button => ({
+              element: button,
+              name: button.textContent.trim().toLowerCase(),
+              dataTab: button.getAttribute('data-tab')
+            }));
+            
+            const categories = Array.from(document.querySelectorAll('.category-header')).map(header => ({
+              element: header,
+              name: header.textContent.trim().toLowerCase()
+            }));
+
+            channels.forEach(channel => channel.element.classList.remove('highlight'));
+            categories.forEach(category => category.element.classList.remove('highlight'));
+            
+            const foundChannel = channels.find(channel => 
+              channel.name.includes(searchTerm) || channel.dataTab.includes(searchTerm)
+            );
+
+            const foundCategory = categories.find(category => 
+              category.name.includes(searchTerm)
+            );
+
+            if (foundChannel) {
+              foundChannel.element.classList.add('highlight');
+              foundChannel.element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              
+              setTimeout(() => {
+                foundChannel.element.click();
+              }, 500);
+            } else if (foundCategory) {
+              foundCategory.element.classList.add('highlight');
+              foundCategory.element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+              alert('Canal ou categoria não encontrada');
+            }
+          }
+        }
+
+        function removeHighlight() {
+          const highlightedChannel = document.querySelector('.tab-button.highlight');
+          if (highlightedChannel) {
+            highlightedChannel.classList.remove('highlight');
+          }
+          const highlightedCategory = document.querySelector('.category-header.highlight');
+          if (highlightedCategory) {
+            highlightedCategory.classList.remove('highlight');
+          }
+        }
+
+        document.addEventListener('click', function(event) {
+          if (!event.target.closest('#channelSearch') && !event.target.closest('#searchButton')) {
+            removeHighlight();
+          }
+        });
+
+        channelSearch.addEventListener('input', function() {
+          if (this.value === '') {
+            removeHighlight();
+          }
+        });
+
+        searchButton.addEventListener('click', searchChannel);
+        channelSearch.addEventListener('keyup', function(event) {
+          if (event.key === 'Enter') {
+            searchChannel();
+          }
+        });
+
+        function hideMouseCursor() {
+          const playerContainers = document.querySelectorAll('.player-container');
+          playerContainers.forEach(container => {
+            let timeout;
+            
+            container.addEventListener('mousemove', () => {
+              container.style.cursor = 'default';
+              clearTimeout(timeout);
+              timeout = setTimeout(() => {
+                container.style.cursor = 'none';
+              }, 3000);
+            });
+
+            container.addEventListener('mouseleave', () => {
+              clearTimeout(timeout);
+              container.style.cursor = 'default';
+            });
+          });
+        }
+
+        hideMouseCursor();
+      });
+
+      window.addEventListener('online', () => {
+        checkInternetConnection();
+        playCurrentChannel();
+      });
+
+      const mainPlayer = document.getElementById('main-player');
+      mainPlayer.addEventListener('ended', function() {
+        console.log("Vídeo terminou, reiniciando o player");
+        initPlayer(mainPlayer, defaultStreamUrl);
+      });
+
+      let lastClick = 0;
+      mainPlayer.addEventListener('click', function() {
+        const currentTime = new Date().getTime();
+        if (currentTime - lastClick < 300) {
+          if (!document.fullscreenElement) {
+            mainPlayer.fullscreen.enter();
+          } else {
+            mainPlayer.fullscreen.exit();
+          }
+        }
+        lastClick = currentTime;
+      });
+
+      function getSourceUrlForChannel(channelId) {
+        const sourceUrls = {
+          'kuriakos-kids': 'https://w2.manasat.com/kkids/smil:kkids.smil/playlist.m3u8',
+          'gospel-movie-tv': 'https://stmv1.srvif.com/gospelf/gospelf/playlist.m3u8',
+          'gospel-cartoon': 'https://stmv1.srvif.com/gospelcartoon/gospelcartoon/playlist.m3u8',
+          'retro-cartoon': 'https://stmv1.srvif.com/retrotv/retrotv/playlist.m3u8',
+          'tela-viva': 'https://srv4.zcast.com.br/telavivatv/telavivatv/playlist.m3u8',
+          'demais-tv': 'https://stmv1.samcast.com.br/demaistv6503/demaistv6503/playlist.m3u8',
+          'play-tv': 'https://playtv.mediastreaming.com.br/play/live.stream/playlist.m3u8',
+          'record-news': 'https://stream.ads.ottera.tv/playlist.m3u8?network_id=2116',
+          'novo-tempo': 'https://stream.live.novotempo.com/tv/smil:tvnovotempo.smil/playlist.m3u8',
+          'sbt-interior': 'https://cdn.jmvstream.com/w/LVW-10801/LVW10801_Xvg4R0u57n/playlist.m3u8',
+          'animax': 'https://stream.ichibantv.com:3547/stream/play.m3u8',
+          'tv-cine': 'https://stmv1.srvif.com/tvserie/tvserie/playlist.m3u8',
+          'bons-tempos': 'https://stmv1.srvif.com/canal29/canal29/playlist.m3u8',
+          'loading': 'https://stmv1.srvif.com/loadingtv/loadingtv/playlist.m3u8',
+          'otaku-sign': 'https://stmv1.srvif.com/otaku/otaku/playlist.m3u8',
+          'tv-aracati': 'https://video04.logicahost.com.br/tvaracati/tvaracati/playlist.m3u8',
+          'anitv': 'https://stream.ichibantv.com:3764/hybrid/play.m3u8',
+          'tv-zyn': 'https://amg01391-sbtinfast-amg01391c2-runtime-latam-1337.playouts.now.amagi.tv/playlist/amg01391-addigital-tvzyn-runtimelatam/playlist.m3u8',
+          'conectv': 'https://stream01.msolutionbrasil.com.br/hls/conectv/live.m3u8',
+          'toon-goggles': 'https://stream.ads.ottera.tv/playlist.m3u8?network_id=274',
+          'adorando-jesus': 'https://stmv1.srvif.com/adorando/adorando/playlist.m3u8',
+          'mi-tv': 'https://stmv4.voxtvhd.com.br/1990/1990/playlist.m3u8',
+          'gospel-music-television': 'https://stmv1.srvif.com/gmusic/gmusic/playlist.m3u8',
+          'filmes-online': 'https://stream.ads.ottera.tv/playlist.m3u8?network_id=6178',
+          'tv-classicos-do-cinema': 'https://stmv1.srvif.com/movies1/movies1/playlist.m3u8',
+          'clouding': 'https://stmv1.paineltv.net/redeclonetv/redeclonetv/playlist.m3u8',
+          'runtime': 'https://stream.ads.ottera.tv/playlist.m3u8?network_id=2552',
+          'tv-osorio': 'https://stmv1.srvstm.com/demo2573/demo2573/playlist.m3u8',
+        };
+        return sourceUrls[channelId] || '';
+      }
+
+      initPlayer(mainPlayer, defaultStreamUrl);
+    </script>
+</div></div></body></html>
