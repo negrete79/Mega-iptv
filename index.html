@@ -27,6 +27,7 @@
             flex: 1;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
         }
         video {
             width: 100%;
@@ -66,8 +67,8 @@
         const streamUrlInput = document.getElementById('streamUrl');
 
         playButton.addEventListener('click', () => {
-            // Usando a URL diretamente sem proxy
-            const streamUrl = streamUrlInput.value;
+            // Usando o CORS Anywhere
+            const streamUrl = `https://cors-anywhere.herokuapp.com/${streamUrlInput.value}`;
             
             if (Hls.isSupported()) {
                 const hls = new Hls();
