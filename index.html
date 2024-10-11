@@ -1,475 +1,259 @@
-<html><head><base href="https://example.com"></base><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Mega IPTV - Streaming IPTV Moderno</title><script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script><script src="https://cdn.tailwindcss.com"></script><style>
-    :root {
-        --primary-color: #ff0000;
-    }
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f0f0f0;
-        color: #333;
-    }
-    .header {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 1rem;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-    }
-    .main-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-    .channel-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-    .channel-card {
-        background-color: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-    .channel-card:hover {
-        transform: translateY(-5px);
-    }
-    .channel-card img {
-        width: 100%;
-        height: 120px;
-        object-fit: cover;
-    }
-    .channel-card .info {
-        padding: 1rem;
-    }
-    .video-player {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: black;
-        z-index: 2000;
-        display: none;
-    }
-    .video-controls {
-        background-color: rgba(0, 0, 0, 0.7);
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .scroll-top {
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-        cursor: pointer;
-        display: none;
-        z-index: 1000;
-    }
-    .admin-panel {
-        background-color: white;
-        border-radius: 8px;
-        padding: 2rem;
-        margin-top: 2rem;
-    }
-    .admin-form {
-        display: grid;
-        gap: 1rem;
-    }
-    .admin-form input, .admin-form select, .admin-form button {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-    .admin-form button {
-        background-color: var(--primary-color);
-        color: white;
-        cursor: pointer;
-    }
-    .admin-form button:hover {
-        background-color: #cc0000;
-    }
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 3000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 500px;
-    }
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    @media (max-width: 768px) {
-        .channel-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega IPTV - Streaming IPTV Moderno</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos básicos */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            position: relative; /* Para o botão de voltar ao topo */
         }
-    }
-</style></head><body>
+        .header {
+            background-color: #ff0000;
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            text-align: center;
+        }
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+        .channel-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer; /* Indica que é clicável */
+            padding: 10px;
+        }
+        .channel-card:hover {
+            transform: translateY(-5px);
+        }
+        .channel-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        .video-player {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        #videoElement {
+            width: 80%; /* Proporção do vídeo */
+            max-height: 80%; /* Limita a altura do vídeo */
+        }
+        button {
+            cursor: pointer;
+            padding: 15px 20px; /* Aumenta o tamanho do botão */
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 1.2em; /* Tamanho da fonte do botão */
+            margin-top: 10px; /* Espaçamento entre botões */
+        }
+        button:hover {
+            background-color: #cc0000;
+        }
+        /* Estilos do rodapé */
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+        .social-icons {
+            margin-top: 10px;
+        }
+        .social-icons a {
+            color: white;
+            margin: 0 10px;
+            font-size: 1.5em; /* Tamanho dos ícones sociais */
+            text-decoration: none;
+        }
+        /* Botão de voltar ao topo */
+        #backToTop {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            display: none; /* Escondido por padrão */
+            cursor: pointer;
+            z-index: 1000;
+        }
+        /* Responsividade */
+        @media (max-width: 768px) {
+            #videoElement {
+                width: 95%; /* Aumenta a largura do vídeo em telas menores */
+            }
+
+            .channel-card img {
+                height: 100px; /* Ajusta a altura da imagem para telas menores */
+            }
+        }
+    </style>
+</head>
+<body>
     <header class="header">
-        <h1 class="text-2xl font-bold">Mega IPTV</h1>
-        <nav>
-            <ul class="flex space-x-4">
-                <li><a href="#" id="adminLink" class="hover:underline">Admin</a></li>
-            </ul>
-        </nav>
+        <h1>Mega IPTV</h1>
     </header>
 
     <main class="main-content">
         <section>
-            <h2 class="text-xl font-semibold mb-4">Canais em Destaque</h2>
-            <div class="channel-grid" id="channelGrid">
-                <!-- Canais serão carregados dinamicamente aqui -->
-            </div>
-        </section>
-
-        <section id="adminPanel" class="admin-panel" style="display: none;">
-            <h2 class="text-xl font-semibold mb-4">Painel de Administração</h2>
-            <form id="addChannelForm" class="admin-form">
-                <input type="text" id="channelName" placeholder="Nome do Canal" required>
-                <input type="url" id="channelUrl" placeholder="URL do Stream" required>
-                <input type="url" id="channelThumbnail" placeholder="URL da Imagem de Thumbnail" required>
-                <select id="channelCategory" required>
-                    <option value="">Selecione a categoria</option>
-                    <option value="geral">Geral</option>
-                    <option value="esportes">Esportes</option>
-                    <option value="noticias">Notícias</option>
-                    <option value="filmes">Filmes</option>
-                    <option value="adulto">Adulto</option>
-                </select>
-                <input type="password" id="channelPassword" placeholder="Senha para operações de canal" class="w-full p-2 border rounded">
-                <button type="submit">Adicionar Canal</button>
-            </form>
-            <button id="logoutAdmin" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-4">
-                Sair do Painel Admin
-            </button>
+            <h2>Canais em Destaque</h2>
+            <div class="channel-grid" id="channelGrid"></div>
         </section>
     </main>
 
-    <div class="video-player" id="videoPlayer">
+    <div class="video-player" id="videoPlayer" style="display: none;">
         <video id="videoElement" controls></video>
-        <div class="video-controls">
-            <button id="closePlayer" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                Fechar
-            </button>
-            <button id="recordChannel" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Gravar
-            </button>
-        </div>
+        <button id="closePlayer" style="display: none;">Fechar</button>
     </div>
 
-    <button id="scrollTop" class="scroll-top">↑</button>
-
-    <div id="adminModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Login de Administrador</h2>
-            <form id="adminLoginForm">
-                <input type="password" id="adminPassword" placeholder="Senha de administrador" required>
-                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Entrar</button>
-            </form>
+    <footer class="footer">
+        <p>&copy; 2023 Mega IPTV. Todos os direitos reservados.</p>
+        <div class="social-icons">
+            <a href="https://t.me/seu_telegram" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.instagram.com/seu_instagram" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
         </div>
-    </div>
+    </footer>
 
-    <div id="adultContentModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Conteúdo Adulto</h2>
-            <p>Você está prestes a acessar conteúdo adulto. Por favor, confirme que você tem mais de 18 anos.</p>
-            <button id="confirmAdult" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Confirmar</button>
-        </div>
-    </div>
-
-    <div id="channelPasswordModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Confirmar Senha</h2>
-            <p>Por favor, insira a senha para realizar esta operação.</p>
-            <input type="password" id="confirmChannelPassword" placeholder="Senha" required>
-            <button id="confirmChannelPasswordBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Confirmar</button>
-        </div>
-    </div>
+    <button id="backToTop">Voltar ao Topo</button>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let channels = JSON.parse(localStorage.getItem('channels')) || [];
-            const adminPassword = "admin123"; 
-            let isAdminLoggedIn = false;
-            let isAdultConfirmed = false;
-            let currentOperation = null;
-            let currentChannelCode = null;
+        const channels = [
+            { name: "Canal 1", url: "http://link-do-canal-1.m3u8", thumbnail: "http://link-da-imagem-1.jpg" },
+            { name: "Canal 2", url: "http://link-do-canal-2.m3u8", thumbnail: "http://link-da-imagem-2.jpg" },
+            // Adicione mais canais aqui
+        ];
 
-            const channelGrid = document.getElementById('channelGrid');
-            const videoPlayer = document.getElementById('videoPlayer');
-            const videoElement = document.getElementById('videoElement');
-            const closePlayer = document.getElementById('closePlayer');
-            const recordChannel = document.getElementById('recordChannel');
-            const scrollTop = document.getElementById('scrollTop');
-            const addChannelForm = document.getElementById('addChannelForm');
-            const adminPanel = document.getElementById('adminPanel');
-            const adminLink = document.getElementById('adminLink');
-            const adminModal = document.getElementById('adminModal');
-            const adminLoginForm = document.getElementById('adminLoginForm');
-            const adultContentModal = document.getElementById('adultContentModal');
-            const confirmAdult = document.getElementById('confirmAdult');
-            const logoutAdmin = document.getElementById('logoutAdmin');
-            const channelPasswordModal = document.getElementById('channelPasswordModal');
-            const confirmChannelPassword = document.getElementById('confirmChannelPassword');
-            const confirmChannelPasswordBtn = document.getElementById('confirmChannelPasswordBtn');
-            const channelPassword = document.getElementById('channelPassword');
+        const channelGrid = document.getElementById('channelGrid');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoElement = document.getElementById('videoElement');
+        const closePlayer = document.getElementById('closePlayer');
+        const backToTop = document.getElementById('backToTop');
 
-            // Add null checks for all elements
-            if (!channelGrid || !videoPlayer || !videoElement || !closePlayer || !recordChannel || 
-                !scrollTop || !addChannelForm || !adminPanel || !adminLink || !adminModal || 
-                !adminLoginForm || !adultContentModal || !confirmAdult || !logoutAdmin || 
-                !channelPasswordModal || !confirmChannelPassword || !confirmChannelPasswordBtn || 
-                !channelPassword) {
-                console.error('One or more required elements are missing from the DOM');
-                return;
-            }
-
-            function generateChannelCode() {
-                return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            }
-
-            function populateChannelGrid() {
-                channelGrid.innerHTML = '';
-                channels.forEach(channel => {
-                    if (channel.category === 'adulto' && !isAdultConfirmed) {
-                        return;
-                    }
-                    const channelCard = document.createElement('div');
-                    channelCard.className = 'channel-card';
-                    channelCard.innerHTML = `
-                        <img src="${channel.thumbnail}" alt="${channel.name}" width="200" height="120">
-                        <div class="info">
-                            <h3>${channel.name}</h3>
-                            <p>Categoria: ${channel.category}</p>
-                            <button class="play-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mt-2" data-url="${channel.url}" data-category="${channel.category}">
-                                Assistir
-                            </button>
-                            ${isAdminLoggedIn ? `
-                                <button class="edit-btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2" data-code="${channel.code}">
-                                    Editar
-                                </button>
-                                <button class="delete-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mt-2" data-code="${channel.code}">
-                                    Excluir
-                                </button>
-                            ` : ''}
-                        </div>
-                    `;
-                    channelGrid.appendChild(channelCard);
-                });
-            }
-
-            function initPlayer(url) {
-                if (Hls.isSupported()) {
-                    const hls = new Hls();
-                    hls.loadSource(url);
-                    hls.attachMedia(videoElement);
-                } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-                    videoElement.src = url;
-                }
-            }
-
-            channelGrid.addEventListener('click', (e) => {
-                if (e.target.classList.contains('play-btn')) {
-                    const url = e.target.dataset.url;
-                    const category = e.target.dataset.category;
-                    if (category === 'adulto' && !isAdultConfirmed) {
-                        adultContentModal.style.display = 'block';
-                        confirmAdult.onclick = () => {
-                            isAdultConfirmed = true;
-                            adultContentModal.style.display = 'none';
-                            initPlayer(url);
-                            videoPlayer.style.display = 'block';
-                        };
-                    } else {
-                        initPlayer(url);
-                        videoPlayer.style.display = 'block';
-                    }
-                } else if (e.target.classList.contains('edit-btn')) {
-                    showPasswordConfirmation('edit', e.target.dataset.code);
-                } else if (e.target.classList.contains('delete-btn')) {
-                    showPasswordConfirmation('delete', e.target.dataset.code);
-                }
+        function populateChannelGrid() {
+            channelGrid.innerHTML = '';
+            channels.forEach((channel, index) => {
+                const channelCard = document.createElement('div');
+                channelCard.className = 'channel-card';
+                channelCard.tabIndex = 0; // Permite foco com controle remoto
+                channelCard.innerHTML = `
+                    <img src="${channel.thumbnail}" alt="${channel.name}">
+                    <div>
+                        <h3>${channel.name}</h3>
+                        <button class="play-btn" data-url="${channel.url}" data-index="${index}">Assistir</button>
+                    </div>
+                `;
+                channelGrid.appendChild(channelCard);
             });
+        }
 
-            function showPasswordConfirmation(operation, channelCode) {
-                currentOperation = operation;
-                currentChannelCode = channelCode;
-                channelPasswordModal.style.display = 'block';
+        function initPlayer(url) {
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(videoElement);
+            } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                videoElement.src = url;
             }
+            videoPlayer.style.display = 'flex'; // Mostra o player como flex para centralizar
+            closePlayer.style.display = 'block'; // Mostra o botão de fechar
+            videoElement.play();
 
-            confirmChannelPasswordBtn.addEventListener('click', () => {
-                if (confirmChannelPassword.value === channelPassword.value) {
-                    channelPasswordModal.style.display = 'none';
-                    if (currentOperation === 'edit') {
-                        editChannel(currentChannelCode);
-                    } else if (currentOperation === 'delete') {
-                        deleteChannel(currentChannelCode);
-                    }
-                } else {
-                    alert('Senha incorreta!');
-                }
-                confirmChannelPassword.value = '';
-            });
+            // Oculta o botão de fechar após 3 segundos
+            setTimeout(() => {
+                closePlayer.style.display = 'none';
+            }, 3000);
+        }
 
-            function editChannel(channelCode) {
-                const channel = channels.find(ch => ch.code === channelCode);
-                if (channel) {
-                    document.getElementById('channelName').value = channel.name;
-                    document.getElementById('channelUrl').value = channel.url;
-                    document.getElementById('channelThumbnail').value = channel.thumbnail;
-                    document.getElementById('channelCategory').value = channel.category;
-
-                    addChannelForm.onsubmit = (e) => {
-                        e.preventDefault();
-                        channel.name = document.getElementById('channelName').value;
-                        channel.url = document.getElementById('channelUrl').value;
-                        channel.thumbnail = document.getElementById('channelThumbnail').value;
-                        channel.category = document.getElementById('channelCategory').value;
-
-                        localStorage.setItem('channels', JSON.stringify(channels));
-                        populateChannelGrid();
-                        addChannelForm.reset();
-                        addChannelForm.onsubmit = addNewChannel; // Reset to add new channel function
-                    };
-                }
+        channelGrid.addEventListener('click', (e) => {
+            if (e.target.classList.contains('play-btn')) {
+                const url = e.target.dataset.url;
+                initPlayer(url);
             }
-
-            function addNewChannel(e) {
-                e.preventDefault();
-                const name = document.getElementById('channelName').value;
-                const url = document.getElementById('channelUrl').value;
-                const thumbnail = document.getElementById('channelThumbnail').value;
-                const category = document.getElementById('channelCategory').value;
-                const code = generateChannelCode();
-
-                const newChannel = { name, url, thumbnail, category, code };
-                channels.push(newChannel);
-                localStorage.setItem('channels', JSON.stringify(channels));
-                populateChannelGrid();
-                addChannelForm.reset();
-            }
-
-            function deleteChannel(channelCode) {
-                if (confirm('Tem certeza que deseja excluir este canal?')) {
-                    channels = channels.filter(ch => ch.code !== channelCode);
-                    localStorage.setItem('channels', JSON.stringify(channels));
-                    populateChannelGrid();
-                }
-            }
-
-            if (closePlayer) {
-                closePlayer.addEventListener('click', () => {
-                    videoPlayer.style.display = 'none';
-                    videoElement.pause();
-                });
-            }
-
-            if (recordChannel) {
-                recordChannel.addEventListener('click', () => {
-                    console.log('Recording channel...');
-                });
-            }
-
-            if (scrollTop) {
-                window.addEventListener('scroll', () => {
-                    if (window.pageYOffset > 300) {
-                        scrollTop.style.display = 'block';
-                    } else {
-                        scrollTop.style.display = 'none';
-                    }
-                });
-
-                scrollTop.addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            }
-
-            if (addChannelForm) {
-                addChannelForm.addEventListener('submit', addNewChannel);
-            }
-
-            if (adminLink) {
-                adminLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (isAdminLoggedIn) {
-                        adminPanel.style.display = 'block';
-                    } else {
-                        adminModal.style.display = 'block';
-                    }
-                });
-            }
-
-            if (adminLoginForm) {
-                adminLoginForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const password = document.getElementById('adminPassword').value;
-                    if (password === adminPassword) {
-                        isAdminLoggedIn = true;
-                        adminModal.style.display = 'none';
-                        adminPanel.style.display = 'block';
-                    } else {
-                        alert('Senha incorreta!');
-                    }
-                });
-            }
-
-            if (logoutAdmin) {
-                logoutAdmin.addEventListener('click', () => {
-                    isAdminLoggedIn = false;
-                    adminPanel.style.display = 'none';
-                    populateChannelGrid(); 
-                });
-            }
-
-            document.querySelectorAll('.close').forEach(closeBtn => {
-                if (closeBtn) {
-                    closeBtn.onclick = function() {
-                        this.closest('.modal').style.display = 'none';
-                    }
-                }
-            });
-
-            window.onclick = function(event) {
-                if (event.target.classList.contains('modal')) {
-                    event.target.style.display = "none";
-                }
-            }
-
-            populateChannelGrid();
         });
+
+        closePlayer.addEventListener('click', () => {
+            videoPlayer.style.display = 'none';
+            videoElement.pause();
+        });
+
+        // Navegação com controle remoto
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowRight") {
+                // Mover para o próximo canal
+                const currentFocus = document.activeElement;
+                const next = currentFocus.nextElementSibling || channelGrid.firstChild;
+                if (next) next.focus();
+            } else if (e.key === "ArrowLeft") {
+                // Mover para o canal anterior
+                const currentFocus = document.activeElement;
+                const prev = currentFocus.previousElementSibling || channelGrid.lastChild;
+                if (prev) prev.focus();
+            } else if (e.key === "Enter") {
+                // Reproduzir o canal focado
+                if (document.activeElement.classList.contains('play-btn')) {
+                    const url = document.activeElement.dataset.url;
+                    initPlayer(url);
+                }
+            }
+        });
+
+        // Mostrar botão de voltar ao topo
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                backToTop.style.display = "block";
+            } else {
+                backToTop.style.display = "none";
+            }
+        };
+
+        // Ação do botão de voltar ao topo
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Inicializa a grade de canais
+        populateChannelGrid();
     </script>
-</body></html>
+</body>
+</html>
+```
+
