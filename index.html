@@ -25,30 +25,8 @@
         .container {
             display: flex;
             flex: 1;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #444;
-            color: #fff;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-        }
-        .sidebar h2 {
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-        .sidebar a {
-            color: #fff;
-            text-decoration: none;
-            display: block;
-            margin: 10px 0;
-        }
-        .sidebar a:hover {
-            text-decoration: underline;
-        }
-        .main {
-            flex: 1;
-            padding: 20px;
+            justify-content: center;
+            align-items: center;
         }
         video {
             width: 100%;
@@ -74,20 +52,11 @@
         <h1>Reprodutor de Stream HLS</h1>
     </header>
     <div class="container">
-        <div class="sidebar">
-            <h2>Painel de Navegação</h2>
-            <a href="#">Home</a>
-            <a href="#">Sobre</a>
-            <a href="#">Contato</a>
-            <a href="#">Ajuda</a>
-        </div>
-        <div class="main">
-            <video id="videoElement" controls></video>
-            <div class="controls">
-                <label for="streamUrl">http://inauth2.cdn23.click//live/889281840/Z451m1324a/272799.m3u8:</label>
-                <input type="text" id="streamUrl" placeholder="http://inauth2.cdn23.click//live/889281840/Z451m1324a/272799.m3u8">
-                <button id="playButton">Reproduzir</button>
-            </div>
+        <video id="videoElement" controls></video>
+        <div class="controls">
+            <label for="streamUrl">Insira a URL do stream .m3u8:</label>
+            <input type="text" id="streamUrl" value="http://inauth2.cdn23.click//live/889281840/Z451m1324a/272799.m3u8" readonly>
+            <button id="playButton">Reproduzir</button>
         </div>
     </div>
 
@@ -97,8 +66,8 @@
         const streamUrlInput = document.getElementById('streamUrl');
 
         playButton.addEventListener('click', () => {
-            // Adicionando o proxy CORS Anywhere
-            const streamUrl = `https://cors-anywhere.herokuapp.com/${streamUrlInput.value}`;
+            // Usando a URL diretamente sem proxy
+            const streamUrl = streamUrlInput.value;
             
             if (Hls.isSupported()) {
                 const hls = new Hls();
