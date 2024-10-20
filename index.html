@@ -1,676 +1,319 @@
-<html><head><base href="https://fanpage.plantas.com/">
+<html><head><base href="https://websim.io/creations/youtube-clone-iptv/">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fanpage de Plantas Medicinais</title>
+<title>KidsTV - Diversão Infantil</title>
 <style>
-  :root {
-    --primary-color: #2ecc71;
-    --secondary-color: #27ae60;
-    --accent-color: #f1c40f;
-    --text-color: #34495e;
-    --background-color: #ecf0f1;
-    --menu-background: #1abc9c;
-    --menu-text-color: #ffffff;
-    --menu-hover-color: #16a085;
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    font-family: 'Roboto', sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--background-color);
-  }
-
-  .container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-
-  header {
-    background-color: var(--primary-color);
-    color: white;
-    text-align: center;
-    padding: 2rem 0;
-    position: relative;
-    overflow: hidden;
-  }
-
-  header::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30,50 Q50,30 70,50 T90,50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/></svg>');
-    background-size: 100px 100px;
-    transform: rotate(45deg);
-    opacity: 0.1;
-    z-index: 0;
-  }
-
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-    position: relative;
-    z-index: 1;
-  }
-
-  .search-container {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  #search-input {
-    width: 300px;
-    padding: 0.5rem;
-    border: none;
-    border-radius: 5px 0 0 5px;
-    font-size: 1rem;
-  }
-
-  #search-button {
-    background-color: var(--accent-color);
-    color: var(--text-color);
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0 5px 5px 0;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-  }
-
-  #search-button:hover {
-    background-color: #e67e22;
-  }
-
-  /* Hidden Menu Styles */
-  .menu-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    background-color: var(--menu-background);
-    color: var(--menu-text-color);
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    transition: background-color 0.3s ease;
-  }
-
-  .menu-toggle:hover {
-    background-color: var(--menu-hover-color);
-  }
-
-  nav {
-    position: fixed;
-    top: 0;
-    right: -300px;
-    width: 300px;
-    height: 100vh;
-    background-color: var(--menu-background);
-    transition: right 0.3s ease;
-    z-index: 999;
-    overflow-y: auto;
-  }
-
-  nav.active {
-    right: 0;
-  }
-
-  nav ul {
-    list-style-type: none;
-    padding: 50px 0;
-  }
-
-  nav ul li {
-    margin: 0;
-  }
-
-  nav ul li a {
-    color: var(--menu-text-color);
-    text-decoration: none;
-    font-weight: bold;
-    padding: 1rem 2rem;
-    display: block;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  nav ul li a:hover {
-    background-color: var(--menu-hover-color);
-    color: white;
-  }
-
-  .menu-item-active {
-    background-color: var(--menu-hover-color);
-  }
-
-  main {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-  }
-
-  .plant-card {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .plant-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  .plant-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-  }
-
-  .plant-info {
-    padding: 1.5rem;
-  }
-
-  .plant-card h3 {
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-  }
-
-  .plant-card p {
-    font-size: 0.9rem;
-    color: var(--text-color);
-  }
-
-  .plant-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
-  }
-
-  .heart-button {
-    background-color: transparent;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-
-  .heart-button:hover {
-    transform: scale(1.1);
-  }
-
-  .share-buttons {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .share-buttons button {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 0.3rem 0.6rem;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: background-color 0.3s ease;
-  }
-
-  .share-buttons button:hover {
-    background-color: var(--secondary-color);
-  }
-
-  .comments-section {
-    margin-top: 1rem;
-  }
-
-  .comments-list {
-    list-style-type: none;
-    padding: 0;
-    margin-bottom: 1rem;
-  }
-
-  .comments-list li {
-    background-color: #f1f1f1;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    border-radius: 3px;
-  }
-
-  .comment-form {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .comment-form input {
-    flex-grow: 1;
-    padding: 0.3rem;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-  }
-
-  .comment-form button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.3rem 0.6rem;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  .comment-form button:hover {
-    background-color: var(--secondary-color);
-  }
-
-  #scroll-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: var(--primary-color);
-    color: white;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, opacity 0.3s ease;
-    opacity: 0;
-    visibility: hidden;
-  }
-
-  #scroll-to-top:hover {
-    background-color: var(--secondary-color);
-  }
-
-  #scroll-to-top.visible {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  /* Admin Panel Styles */
-  #admin-panel {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-top: 2rem;
-  }
-
-  #admin-panel h2 {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-  }
-
-  #admin-login-form {
-    margin-bottom: 1rem;
-  }
-
-  #admin-login-form input {
-    width: calc(100% - 100px);
-  }
-
-  #add-plant-form {
-    display: grid;
-    gap: 1rem;
-  }
-
-  #add-plant-form input,
-  #add-plant-form textarea {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-
-  #add-plant-form button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-  }
-
-  #add-plant-form button:hover {
-    background-color: var(--secondary-color);
-  }
-
-  @media screen and (max-width: 768px) {
-    nav {
-      width: 100%;
-      right: -100%;
+    :root {
+        --primary-color: #FF9FF3;
+        --secondary-color: #54A0FF;
+        --background-color: #F0F3F7;
+        --text-color: #2C3E50;
+        --button-color: #d5006d;
     }
-  }
+
+    body {
+        font-family: 'Rounded Mplus 1c', sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+    }
+
+    header {
+        background-color: var(--primary-color);
+        padding: 10px 20px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+
+    h1 {
+        margin: 0;
+        color: white;
+        font-size: 1.5em;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 60px auto 0;
+        padding: 20px;
+    }
+
+    .player-container {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        position: sticky;
+        top: 60px;
+        z-index: 900;
+    }
+
+    #video-player {
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+        position: relative;
+    }
+
+    #video-player video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .carousel {
+        display: flex;
+        overflow-x: auto;
+        padding: 10px 0;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .carousel-inner {
+        display: flex;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .channel-item {
+        flex: 0 0 auto;
+        width: 100px;
+        margin-right: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .channel-item:hover {
+        transform: scale(1.05);
+    }
+
+    .channel-item img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--secondary-color);
+    }
+
+    .channel-item p {
+        margin-top: 5px;
+        font-size: 0.8em;
+        color: var(--text-color);
+    }
+
+    .channel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .channel-grid .channel-item {
+        width: 100%;
+        background-color: white;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .channel-grid .channel-item img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    footer {
+        background-color: var(--primary-color);
+        color: white;
+        text-align: center;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .social-icons img {
+        width: 30px;
+        margin: 0 10px;
+        transition: transform 0.3s ease;
+    }
+
+    .social-icons img:hover {
+        transform: scale(1.2);
+    }
+
+    #scrollToTopBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 15px;
+        background-color: var(--button-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        display: none;
+        transition: opacity 0.3s ease;
+    }
+
+    #scrollToTopBtn:hover {
+        opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            margin-top: 50px;
+        }
+
+        .player-container {
+            top: 50px;
+        }
+
+        .channel-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+        
+        .channel-item {
+            width: 80px;
+        }
+
+        .channel-item img {
+            width: 60px;
+            height: 60px;
+        }
+    }
 </style>
 </head>
 <body>
-  <header id="home">
-    <h1>Fanpage de Plantas Medicinais</h1>
-    <p>Descubra e compartilhe o poder da natureza</p>
-    <div class="search-container">
-      <input type="text" id="search-input" placeholder="Buscar plantas...">
-      <button id="search-button">Buscar</button>
-    </div>
-  </header>
+    <header>
+        <h1>🌈 KidsTV</h1>
+    </header>
 
-  <button class="menu-toggle" aria-label="Abrir menu">☰</button>
-
-  <nav>
-    <ul>
-      <li><a href="#home" class="menu-item-active">Início</a></li>
-      <li><a href="#plantas">Plantas</a></li>
-      <li><a href="#sobre">Sobre</a></li>
-      <li><a href="#contato">Contato</a></li>
-      <li><a href="#admin-panel">Admin</a></li>
-    </ul>
-  </nav>
-
-  <div class="container">
-    <main id="plantas">
-      <!-- Plantas serão inseridas aqui dinamicamente -->
-    </main>
-
-    <section id="sobre">
-      <h2>Sobre Nós</h2>
-      <p>Informações sobre a fanpage de plantas medicinais...</p>
-    </section>
-
-    <section id="contato">
-      <h2>Contato</h2>
-      <p>Informações de contato...</p>
-    </section>
-
-    <div id="admin-panel">
-      <h2>Painel do Administrador</h2>
-      <form id="admin-login-form">
-        <input type="password" id="admin-password" placeholder="Senha do Administrador" required>
-        <button type="submit">Entrar</button>
-      </form>
-      <div id="admin-content" style="display: none;">
-        <form id="add-plant-form">
-          <input type="text" id="plant-name" placeholder="Nome da Planta" required>
-          <textarea id="plant-description" placeholder="Descrição da Planta" required></textarea>
-          <input type="url" id="plant-image" placeholder="URL da Imagem" required>
-          <button type="submit">Adicionar Planta</button>
-        </form>
-        <h3>Plantas Existentes</h3>
-        <ul id="admin-plant-list"></ul>
-      </div>
-    </div>
-  </div>
-
-  <button id="scroll-to-top" aria-label="Voltar ao topo">↑</button>
-
-  <script>
-    const adminPassword = "123"; // Change this to your desired password
-
-    function checkAdminPassword(e) {
-      e.preventDefault();
-      const passwordInput = document.getElementById('admin-password');
-      const adminContent = document.getElementById('admin-content');
-      const loginForm = document.getElementById('admin-login-form');
-
-      if (passwordInput.value === adminPassword) {
-        adminContent.style.display = 'block';
-        loginForm.style.display = 'none';
-      } else {
-        alert('Senha incorreta. Tente novamente.');
-        passwordInput.value = '';
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const searchButton = document.getElementById('search-button');
-      const searchInput = document.getElementById('search-input');
-
-      searchButton.addEventListener('click', searchPlants);
-      searchInput.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') {
-          searchPlants();
-        }
-      });
-
-      const adminLoginForm = document.getElementById('admin-login-form');
-      adminLoginForm.addEventListener('submit', checkAdminPassword);
-    });
-
-    let plants = [
-      { name: 'Camomila', description: 'A camomila é conhecida por suas propriedades calmantes e anti-inflamatórias. Excelente para aliviar o estresse e promover um sono tranquilo.', image: 'https://example.com/chamomile.jpg', likes: 0, comments: [] },
-      { name: 'Hortelã', description: 'A hortelã auxilia na digestão, alivia náuseas e pode ajudar a melhorar a concentração. Seu aroma refrescante também pode aliviar a congestão nasal.', image: 'https://example.com/mint.jpg', likes: 0, comments: [] },
-      { name: 'Aloe Vera', description: 'O aloe vera é conhecido por suas propriedades cicatrizantes e hidratantes. Pode ser usado topicamente para tratar queimaduras leves e irritações na pele.', image: 'https://example.com/aloe-vera.jpg', likes: 0, comments: [] },
-      { name: 'Gengibre', description: 'O gengibre tem propriedades anti-inflamatórias e pode ajudar a aliviar náuseas, dores musculares e articulares. Também é conhecido por fortalecer o sistema imunológico.', image: 'https://example.com/ginger.jpg', likes: 0, comments: [] },
-      { name: 'Lavanda', description: 'A lavanda é famosa por suas propriedades relaxantes e calmantes. Pode ajudar a reduzir a ansiedade, melhorar o sono e aliviar dores de cabeça.', image: 'https://example.com/lavender.jpg', likes: 0, comments: [] },
-      { name: 'Eucalipto', description: 'O eucalipto é conhecido por suas propriedades descongestionantes e expectorantes. Pode ajudar a aliviar sintomas de resfriados e gripes, além de melhorar a respiração.', image: 'https://example.com/eucalyptus.jpg', likes: 0, comments: [] }
-    ];
-
-    function renderPlants(plantsToRender = plants) {
-      const main = document.querySelector('main');
-      main.innerHTML = '';
-      plantsToRender.forEach((plant, index) => {
-        const plantCard = document.createElement('div');
-        plantCard.className = 'plant-card';
-        plantCard.innerHTML = `
-          <img src="${plant.image}" alt="${plant.name}, planta medicinal" width="300" height="200">
-          <div class="plant-info">
-            <h3>${plant.name}</h3>
-            <p>${plant.description}</p>
-            <div class="plant-actions">
-              <button class="heart-button" onclick="likePlant(${index})">
-                ❤️ ${plant.likes}
-              </button>
-              <div class="share-buttons">
-                <button onclick="sharePlant('facebook', '${plant.name}')">Facebook</button>
-                <button onclick="sharePlant('twitter', '${plant.name}')">Twitter</button>
-                <button onclick="sharePlant('whatsapp', '${plant.name}')">WhatsApp</button>
-              </div>
+    <div class="container">
+        <div class="player-container">
+            <div id="video-player">
+                <video controls></video>
             </div>
-            <div class="comments-section">
-              <h4>Comentários</h4>
-              <ul class="comments-list">
-                ${plant.comments ? plant.comments.map(comment => `<li>${comment}</li>`).join('') : ''}
-              </ul>
-              <form class="comment-form" onsubmit="addComment(event, ${index})">
-                <input type="text" placeholder="Adicione um comentário" required>
-                <button type="submit">Enviar</button>
-              </form>
+            <div class="carousel">
+                <div class="carousel-inner" id="carouselInner"></div>
             </div>
-          </div>
-        `;
-        main.appendChild(plantCard);
-      });
-      updateAdminPlantList();
-    }
+        </div>
 
-    function likePlant(index) {
-      plants[index].likes++;
-      renderPlants();
-    }
+        <div class="channel-grid" id="channelGrid"></div>
+    </div>
 
-    function sharePlant(platform, plantName) {
-      const url = encodeURIComponent(window.location.href);
-      const text = encodeURIComponent(`Confira esta planta medicinal incrível: ${plantName}`);
-      let shareUrl;
+    <footer>
+        <p>© 2023 KidsTV. Todos os direitos reservados.</p>
+        <div class="social-icons">
+            <a href="https://telegram.org" target="_blank">
+                <img src="https://i.postimg.cc/j26JGB80/Photoroom-20241005-021836.png" alt="Telegram">
+            </a>
+            <a href="https://instagram.com" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
+            </a>
+            <a href="https://youtube.com" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube">
+            </a>
+        </div>
+        <p>Entretenimento infantil para todas as idades!</p>
+    </footer>
 
-      switch (platform) {
-        case 'facebook':
-          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-          break;
-        case 'twitter':
-          shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
-          break;
-        case 'whatsapp':
-          shareUrl = `https://api.whatsapp.com/send?text=${text}%20${url}`;
-          break;
-      }
+    <button id="scrollToTopBtn">↑ Topo</button>
 
-      window.open(shareUrl, '_blank');
-    }
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const videoPlayer = document.querySelector('#video-player video');
+        const carouselInner = document.getElementById('carouselInner');
+        const channelGrid = document.getElementById('channelGrid');
+        let hls;
 
-    function addComment(event, index) {
-      event.preventDefault();
-      const form = event.target;
-      const input = form.querySelector('input');
-      const comment = input.value.trim();
+        const channels = [
+            { name: "Discovery Kids", logo: "https://d18o29lhcg4kda.cloudfront.net/fit-in/250x250/Y2gwMTAwMDAwMDAwMDE1X2xpbmVhcl9jaGFubmVsX2Jy_11002_LOGO_250x250.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1007.m3u8" },
+            { name: "Cartoon Network", logo: "https://d18o29lhcg4kda.cloudfront.net/fit-in/360x270/Y2gwMTAwMDAwMDAwMDk0X2xpbmVhcl9jaGFubmVsX2Jy_11002_LOGO_360x270.png?timestamp=1724333416698", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/956.m3u8" },
+            { name: "Disney Channel", logo: "https://i.imgur.com/LblzhZd.jpg", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1022.m3u8" },
+            { name: "Nickelodeon", logo: "https://i.imgur.com/OAIk8nv.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1552.m3u8" },
+            { name: "Cartoonito", logo: "https://d18o29lhcg4kda.cloudfront.net/fit-in/360x270/Y2gwMTAwMDAwMDAwMDgwX2xpbmVhcl9jaGFubmVsX2Jy_11002_LOGO_360x270.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/959.m3u8" },
+            { name: "Baby TV", logo: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Babytvv.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/919.m3u8" },
+            { name: "Gloob", logo: "https://i.imgur.com/6zr8u9x.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1454.m3u8" },
+            { name: "Gloobinho", logo: "https://i.imgur.com/aQlqy0o.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1457.m3u8" },
+            { name: "Zoomoo", logo: "https://i.imgur.com/9beIdtp.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1792.m3u8" },
+            { name: "Ra ti bum", logo: "https://i.imgur.com/cMvC2gg.png", stream: "http://streamx5.com.br:80/live/Painelmanager47/QfsEpx37Lv/1758.m3u8" }
+        ];
 
-      if (comment) {
-        if (!plants[index].comments) {
-          plants[index].comments = [];
+        function loadStream(url) {
+            if (Hls.isSupported()) {
+                if (hls) {
+                    hls.destroy();
+                }
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(videoPlayer);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    videoPlayer.play();
+                });
+            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                videoPlayer.src = url;
+                videoPlayer.addEventListener('loadedmetadata', () => {
+                    videoPlayer.play();
+                });
+            }
         }
-        plants[index].comments.push(comment);
-        renderPlants();
-        input.value = '';
-      }
-    }
 
-    function searchPlants() {
-      const searchTerm = document.getElementById('search-input').value.toLowerCase();
-      const filteredPlants = plants.filter(plant => 
-        plant.name.toLowerCase().includes(searchTerm) || 
-        plant.description.toLowerCase().includes(searchTerm)
-      );
-      renderPlants(filteredPlants);
-    }
+        function createChannelItem(channel, isCarousel = false) {
+            const item = document.createElement('div');
+            item.className = 'channel-item';
+            item.innerHTML = `
+                <img src="${channel.logo}" alt="${channel.name}">
+                <p>${channel.name}</p>
+            `;
+            item.onclick = () => loadStream(channel.stream);
+            return item;
+        }
 
-    const scrollToTopButton = document.getElementById('scroll-to-top');
+        function loadChannelsIntoCarousel() {
+            channels.forEach(channel => {
+                carouselInner.appendChild(createChannelItem(channel, true));
+            });
+        }
 
-    window.addEventListener('scroll', () => {
-      if (window.pageYOffset > 100) {
-        scrollToTopButton.classList.add('visible');
-      } else {
-        scrollToTopButton.classList.remove('visible');
-      }
-    });
+        function loadChannelsIntoGrid() {
+            channels.forEach(channel => {
+                channelGrid.appendChild(createChannelItem(channel));
+            });
+        }
 
-    scrollToTopButton.addEventListener('click', () => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    });
-
-    const addPlantForm = document.getElementById('add-plant-form');
-    function addNewPlant(e) {
-      e.preventDefault();
-      const name = document.getElementById('plant-name').value;
-      const description = document.getElementById('plant-description').value;
-      const image = document.getElementById('plant-image').value;
-      
-      const newPlant = {
-        name,
-        description,
-        image,
-        likes: 0,
-        comments: []
-      };
-
-      plants.push(newPlant);
-      renderPlants();
-      addPlantForm.reset();
-    }
-    addPlantForm.onsubmit = addNewPlant;
-
-    function editPlant(index) {
-      const plant = plants[index];
-      document.getElementById('plant-name').value = plant.name;
-      document.getElementById('plant-description').value = plant.description;
-      document.getElementById('plant-image').value = plant.image;
-      
-      addPlantForm.onsubmit = (e) => {
-        e.preventDefault();
-        plant.name = document.getElementById('plant-name').value;
-        plant.description = document.getElementById('plant-description').value;
-        plant.image = document.getElementById('plant-image').value;
-        renderPlants();
-        addPlantForm.reset();
-        addPlantForm.onsubmit = addNewPlant;
-      };
-    }
-
-    function deletePlant(index) {
-      if (confirm('Tem certeza que deseja excluir esta planta?')) {
-        plants.splice(index, 1);
-        renderPlants();
-      }
-    }
-
-    function updateAdminPlantList() {
-      const adminPlantList = document.getElementById('admin-plant-list');
-      const adminContent = document.getElementById('admin-content');
-      
-      if (adminContent.style.display === 'block') {
-        adminPlantList.innerHTML = '';
-        plants.forEach((plant, index) => {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            ${plant.name}
-            <button onclick="editPlant(${index})">Editar</button>
-            <button onclick="deletePlant(${index})">Excluir</button>
-          `;
-          adminPlantList.appendChild(li);
+        window.addEventListener('load', () => {
+            loadChannelsIntoCarousel();
+            loadChannelsIntoGrid();
+            if (channels.length > 0) {
+                loadStream(channels[0].stream);
+            }
         });
-      }
-    }
 
-    const menuToggle = document.querySelector('.menu-toggle');
-    const nav = document.querySelector('nav');
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+        window.onscroll = function() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollToTopBtn.style.display = "block";
+            } else {
+                scrollToTopBtn.style.display = "none";
+            }
+        };
 
-    menuToggle.addEventListener('click', () => {
-      nav.classList.toggle('active');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!nav.contains(e.target) && !menuToggle.contains(e.target)) {
-        nav.classList.remove('active');
-      }
-    });
-
-    const menuItems = document.querySelectorAll('nav ul li a');
-    menuItems.forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-        menuItems.forEach(i => i.classList.remove('menu-item-active'));
-        this.classList.add('menu-item-active');
-        nav.classList.remove('active');
-
-        const targetId = this.getAttribute('href').substring(1);
-        const targetElement = document.getElementById(targetId);
-        
-        if (targetElement) {
-          targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      });
-    });
-
-    renderPlants();
-  </script>
+        scrollToTopBtn.onclick = function() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+    </script>
 </body>
 </html>
